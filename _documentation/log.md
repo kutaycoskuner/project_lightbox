@@ -34,9 +34,9 @@
 
 # Todo
 - [x] 29.07.2024 26.07.2024 add auto reload function
+- [x] 29.07.2024 25.07.2024 how to focus on outliner
 - 25.07.2024 how to project folder structre function split
 - 25.07.2024 how to import multiple files 
-- 25.07.2024 how to focus on outliner
 
 # Procedure
 - log updates
@@ -46,6 +46,12 @@
 - push
 
 # Log 
+- [0.12] focus selected item on outliner
+    - 29-Jul-2024
+        - add primitive dynamic text edit on ui
+        - fix not selected case 
+        - add focus selected item on outliner function
+
 - [0.11] add auto reload function
     - 29-Jul-2024
         - wip focus active object on outliner

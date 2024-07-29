@@ -1,14 +1,5 @@
 # ----------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------
-#               libs
-# ----------------------------------------------------------------------------------------
-import bpy
-import importlib
-import sys
-import os
-import re
-
-# ----------------------------------------------------------------------------------------
 #               info
 # ----------------------------------------------------------------------------------------
 bl_info = {
@@ -24,11 +15,22 @@ bl_info = {
 }
 
 # ----------------------------------------------------------------------------------------
+#               libs
+# ----------------------------------------------------------------------------------------
+import bpy
+import importlib
+import sys
+import os
+import re
+
+
+# ----------------------------------------------------------------------------------------
 #               variables
 # ----------------------------------------------------------------------------------------
-is_devmode    = True
-is_registered = False  # Add a flag to track if the addon is registered
+is_devmode    = False
 is_timereload = False 
+
+is_registered = False  # Add a flag to track if the addon is registered
 
 addon_keymaps = []
 
@@ -47,13 +49,11 @@ if addon_filepath and os.path.exists(addon_filepath):
 def reload_addon():
     global is_registered
     addon_name = os.path.basename(__file__).split('.')[0]
-    print('reloading..')  
+    print('reloading..')
     if addon_name in sys.modules:  
-        unregister()
         importlib.reload(sys.modules[addon_name]) 
         reload_addon_script() 
     else:
-        unregister()
         importlib.import_module(addon_name) 
         reload_addon_script() 
 
@@ -74,6 +74,12 @@ def get_text_editor_area():
             if area.type == "TEXT_EDITOR":
                 return area
 
+def get_area(area_id):
+    for screen in bpy.data.screens:
+        for area in screen.areas: 
+            if area.type == area_id:
+                return area
+
 
 def reload_addon_script():
     area = get_text_editor_area()
@@ -84,6 +90,7 @@ def reload_addon_script():
                     context_override = {}
                     context_override["edit_text"] = bpy.data.texts["main.py"]
                     with bpy.context.temp_override(**context_override):
+                        print('context overriding..')
                         bpy.ops.text.resolve_conflict(resolution='RELOAD')
                         bpy.ops.text.run_script() 
                     break
@@ -102,7 +109,10 @@ def register():
         # ----- keymap -----
         wm = bpy.context.window_manager
         km = wm.keyconfigs.addon.keymaps.new(name='Window', space_type='EMPTY')
-        kmi = km.keymap_items.new(Object_OT_ReloadAndRun.bl_idname, 'W', 'PRESS', ctrl=False, shift=True, alt=True)
+        
+        kmi = km.keymap_items.new(Object_OT_ReloadAndRun.bl_idname, 'Q', 'PRESS', ctrl=False, shift=True, alt=True)
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(View3D_OT_FocusOutliner.bl_idname, 'W', 'PRESS', ctrl=False, shift=True, alt=True)
         addon_keymaps.append((km, kmi))
 
         # ----- register state -----
@@ -158,14 +168,16 @@ class AddonPanel(bpy.types.Panel):
     bl_idname = "ARCH_PT_lightbox_panel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = 'Lightbox'
+    bl_category = 'lightbox'
+    
 
     def draw(self, context):
         layout = self.layout
+        display_toggle_clay = str(context.scene.get("clay_material_applied", False))
 
         row = layout.row()
-        # row.label(text="Activate Lightbox", icon="SNAP_VERTEX")
         row.operator('shader.toggle_clay_operator')
+        row.label(text=display_toggle_clay)
         
         row = layout.row() 
         # row.label(text="Activate Lightbox a ", icon="SNAP_VERTEX")
@@ -173,7 +185,7 @@ class AddonPanel(bpy.types.Panel):
 
 
 class Shader_OT_ToggleClay(bpy.types.Operator):
-    bl_label = "Toggle Clay Material"
+    bl_label = "Toggle Clay Override"
     bl_idname = "shader.toggle_clay_operator"
     clay_material_name = "lightbox_clay"
 
@@ -247,22 +259,22 @@ class Shader_OT_ToggleClay(bpy.types.Operator):
 
 class View3D_OT_FocusOutliner(bpy.types.Operator):
     bl_idname = "view3d.focus_outliner"
-    bl_label = "Focus Outliner on Selected"
+    bl_label = "Focus Selected on Outliner"
 
     def execute(self, context):
         # Get the active object
         obj = context.active_object
 
-        for area in bpy.context.screen.areas:
-            if area.type == 'OUTLINER':
-                for region in area.regions:
-                    if region.type == 'WINDOW':
-                        print(obj) 
-        #                 # override = {'area': area, 'region': region}
-        #                 bpy.ops.outliner.show_active()
-                        break
-
-        # with bpy.context.temp_override(area=bpy.context.area):
+        if bpy.context.screen.areas:
+            for area in bpy.context.screen.areas:
+                # print(area.type)
+                if area.type == 'OUTLINER':
+                    for region in area.regions:
+                        if region.type == 'WINDOW':
+                                with bpy.context.temp_override(area=area, region=region):
+                                    bpy.ops.outliner.show_active()
+                                    break
+                    break
 
         return {'FINISHED'}
 

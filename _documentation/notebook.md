@@ -9,6 +9,8 @@
     - https://projects.blender.org/blender/blender/issues?labels=302
 - bpy docs
     - https://docs.blender.org/api/current/index.html
+- sharing python code
+    - https://bpa.st/
 
 
 # Packages
@@ -73,6 +75,8 @@
 - <reload script on multiple file addon | addon reloading>
     - https://projects.blender.org/blender/blender-manual/issues/67387
     - failed
+        - https://projects.blender.org/blender/blender/issues/113644
+    - fixed 
         - https://projects.blender.org/blender/blender/issues/113644
     - load addon
     - f3 > reload scripts
