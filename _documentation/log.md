@@ -33,6 +33,10 @@
     - test: testing
 
 # Todo
+- [x] 29.07.2024 26.07.2024 add auto reload function
+- 25.07.2024 how to project folder structre function split
+- 25.07.2024 how to import multiple files 
+- 25.07.2024 how to focus on outliner
 
 # Procedure
 - log updates
@@ -42,6 +46,18 @@
 - push
 
 # Log 
+- [0.11] add auto reload function
+    - 29-Jul-2024
+        - wip focus active object on outliner
+        - add auto reload function by key
+        - add auto reload function by time
+    - 26-Jul-2024 fix: python download 3.12
+    - 25-Jul-2024
+        - 22.54-01.01
+            - fail attempt to seperate files, add outline focuser
+        - 13.20-14.03
+            - wip defining tasks
+
 - [0.1] base project clay overlay for eeevee
     - 25-Jul-2024
         - 03.00-04.26
