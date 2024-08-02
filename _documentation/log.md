@@ -35,17 +35,30 @@
 # Todo
 - [x] 29.07.2024 26.07.2024 add auto reload function
 - [x] 29.07.2024 25.07.2024 how to focus on outliner
-- 25.07.2024 how to project folder structre function split
-- 25.07.2024 how to import multiple files 
+- [x] 02.08.2024 25.07.2024 how to project folder structre function split
+- [x] 02.08.2024 25.07.2024 how to import multiple files 
 
 # Procedure
 - log updates
 - check todo
 - update version and date
+    - main init
+    - readme
 - update timelog
 - push
 
 # Log 
+- [0.13] add architectre and dev environment
+    - 02-Aug-2024
+        - add: license, readme on addon folder
+        - add: split file architecture
+        - add: development environment setup
+
+    - 01-Aug-2024
+        - wip: multi file structure  (-16.22, 2h)
+        - fix: addon reload function (-14.26, 1h50m)
+        - wip: node texture display
+
 - [0.12] focus selected item on outliner
     - 29-Jul-2024
         - add primitive dynamic text edit on ui
