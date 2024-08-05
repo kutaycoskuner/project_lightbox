@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lightbox | Blender Add-on</title>
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+            font-size: 1em;
+            line-height: 1.5em;
+            max-width: 1000px;
+            margin: 2em auto;
+            padding: 0;
+            background-color: #f2f2f2;
+            color: #242424;
+        }
+        .center {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        ol li {
+            padding: .2em;
+        }
+        .presentation-box {
+            margin-bottom: 4em;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            margin-top: 2em;
+            color: #2c3e50;
+        }
+        h2 {
+            padding-bottom: .2em;
+            border-bottom: 1px solid rgba(0,0,0,.4);
+        }
+        .features-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .features-list li {
+            margin: 1.5em 0;
+        }
+        .feature-title {
+            opacity: .8;
+            font-weight: bold;
+        }
+        .checkbox {
+            margin-right: 10px;
+        }
+        .access {
+            display: block;
+            margin: 1em 0 0 0;
+            color:#7f8c8d;
+            line-height: 1.5em;
+        }
+        a {
+            padding: .2em .8em;
+            text-decoration: none;
+        }
+        a:hover {
+            font-weight: bold;
+            background: rgba(0,0,0, .04);
+            border-radius: 2px;
+        }
+        .keyboard-key-block {
+            display: inline-flex;
+            opacity: .6;
+        }
+        .keyboard-key {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 1em;
+            margin-right: .5em;
+            padding: .2em;
+            background-color: var(--bg);
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-shadow: 0 2px 1px rgba(0, 0, 0, 0.4);
+            font-size: .7em;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #333;
+        }
+        .keyboard-key:hover {
+            box-shadow: none;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+        .sketch-frame {
+            background:transparent;
+            padding:0.5rem 0.5rem;
+            padding-bottom: 3em;
+            font-size:1rem;
+            border-top-left-radius: 255px 15px;
+            border-top-right-radius: 15px 225px;
+            border-bottom-right-radius: 180px 10px;
+            border-bottom-left-radius:15px 255px;
+        }
+        .sketch-frame:hover{
+            box-shadow:2px 8px 4px -6px hsla(0,0%,0%,.3);
+        }
+        .sketch-frame.lined.thin{
+            border:2px solid rgba(0,0,0,.04);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="presentation-box center sketch-frame lined thin">
+            <h1>Lightbox</h1>
+            <p>Blender study add-on for various utility functions.</p>
+            <p align="center">
+                <a href="https://github.com/kutaycoskuner/project_lightbox">Github</a> |
+                <!-- <a href="">Blender Market</a> |
+                <a href="">Gumroad</a> | -->
+                <a href="https://github.com/kutaycoskuner/project_lightbox/issues">Report an Issue</a> 
+                <!-- <a href="">Buy me a coffee</a> -->
+            </p>
+        </div>
+
+        <!-- <h2>About</h2>
+        <p>Blender study addon for various utility functions.</p> -->
+        
+
+        <h2>Installation</h2>
+        <ol>
+            <li>Open Blender.</li>
+            <li>In the top bar, open the Edit menu.</li>
+            <li>Select Preferences window.</li>
+            <li>On the left side of the Preferences window, choose the Add-ons tab.</li>
+            <li>In the top right of the Preferences window, click down arrow, then click the Install button.</li>
+            <li>Browse to the Lightbox .zip file you downloaded.</li>
+            <li>In the bottom right of the file browser, click Install Add-on.</li>
+            <li>You should now see Lightbox in the list of add-ons.</li>
+            <li>Tick the box to the left of the add-on name to enable it.</li>
+            <li>On your 3D Viewport press N to open context menus.</li>
+            <li>You should be able to see Lightbox UI on right of your editor.</li>
+        </ol>
+        
+        <h2>Features</h2>
+        <ul class="features-list">
+            <!-- <li>
+                <input type="checkbox" class="checkbox" disabled> 
+                <span class="feature-title">Renderqueue</span>
+            </li>
+            <li>
+                <input type="checkbox" class="checkbox" disabled> 
+                <span class="feature-title">Node Preview</span>
+            </li> -->
+            <li>
+                <input type="checkbox" class="checkbox" checked disabled> 
+                <span class="feature-title">EEVEE Clay Material Override</span>
+                <div class="access">
+                    <span> Overrides all materials within the scene with a basic clay material. Toggles back to the original materials on button click. </span><br>
+                    <span> <strong>Access</strong> </span>
+                    &emsp; <i>View3D > Lightbox > Toggle Clay</i>
+                </div>
+            </li>
+            <li>
+                <input type="checkbox" class="checkbox" checked disabled> 
+                <span class="feature-title">Focus Selected on Outliner</span>
+                <div class="access">
+                    <span>Focuses selected object on View3D on outliner on complex scenes. </span> <br>
+                    <span> </span><strong>Access</strong> </span>
+                    &emsp; <i>View3D > Lightbox > Focus Outliner</i> <br> 
+                    &emsp; &emsp; &emsp; &emsp; <span class="keyboard-key-block">
+                        <div class="keyboard-key">shift</div>
+                        <div class="keyboard-key">alt</div>
+                        <div class="keyboard-key">w</div>
+                    </span>
+                </div>
+            </li>
+        </ul>
+<!-- 
+        <h2>Development Environment</h2>
+
+        <h2>Configuration</h2> -->
+
+    </div>
+</body>
+</html>

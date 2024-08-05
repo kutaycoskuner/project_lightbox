@@ -3,8 +3,8 @@
 #               info
 # ----------------------------------------------------------------------------------------
 from . import (
-    panels,
     operators,
+    panels,
     keyboard,
 )
 
@@ -16,7 +16,7 @@ bl_info = {
     "name": "Lightbox",
     "description": "Various utility functionalities",
     "author": "Kutay Coskuner",
-    "version": (0, 13),
+    "version": (0, 14),
     "blender": (4, 2, 0),
     "location": "View3D > Tool",
     "warning": "",
@@ -26,8 +26,8 @@ bl_info = {
 
 
 modules = (
-    panels,
     operators,
+    panels,
     keyboard
 )
 

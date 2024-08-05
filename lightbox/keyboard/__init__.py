@@ -15,7 +15,7 @@ def register():
 def unregister():
     for km, kmi in addon_keymaps:
         km.keymap_items.remove(kmi)
-        addon_keymaps.clear()
+    addon_keymaps.clear()
 
 
 addon_keymaps = []
@@ -24,4 +24,5 @@ addon_keymaps = []
 # Operator Id, key, ctl, shift, alt
 key_tuples = (
     ('view3d.focus_outliner', 'W', False, True, True),
+    # ('node.draw_squares', 'S', False, True, True),
 )

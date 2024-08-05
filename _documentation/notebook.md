@@ -1,6 +1,14 @@
 # Notebook
 
 # Links
+- css sketched line
+    - https://stackoverflow.com/questions/43694588/can-i-use-css-to-distort-borders-so-they-look-like-sketched
+    - https://github.com/chr15m/DoodleCSS
+
+- readme example
+    - https://github.com/Griperis/BlenderDataVis?tab=readme-ov-file
+    - https://github.com/telegramdesktop/tdesktop/blob/dev/README.md
+
 - blender addon dev env
     - https://blenderartists.org/t/share-your-addons-development-environment/1332819
     - https://polynook.com/learn/set-up-blender-addon-development-environment-in-windows#dealing-with-the-python-is-not-installed-popup
@@ -25,6 +33,15 @@
 - how to think like cs
     - https://runestone.academy/ns/books/published/thinkcspy/index.html
 
+# Structure
+- /lightbox
+    - __init__.py
+    - /keyboard
+        - __init__.py
+    - /operators
+        - __init__.py
+    - /panels
+        - __init__.py
 
 # Setting up environment
 - install blender
@@ -67,6 +84,11 @@
 # Structure
 
 # Blackboard
+- <naming convention>
+    - pt -> panel type
+    - ot -> object type
+    - mt -> ? menu type
+
 - <what is linter>
     - A linter is a program that checks your code for syntax and style errors and highlights them.
 
@@ -122,8 +144,24 @@
 
 
 # Problems
+- <class fonksiyonunu disaridan cagirma>
+    - see. node_ot_previewdrawer
+    - global instance obje yaratinca global array icine at
+    - staticte loop yaptirip cleanup calistir
+
 - <attempted relative import with no known parent package>
-    - 
+    - development environmenti degistirerek cozdum
+
+- <ReferenceError: StructRNA of type Node_OT_PreviewDrawer has been removed>
+    - debugging ile cozdum
+    1. structa acip nerede soruna girdigine dair parametreleri inceledim.
+    2. hicbir zaman callback idrawdan kaldiramiyor cunku self reference errore dusuyor
+    3. handler a global referans verip ekleyerek. unregisterda iptal ettim.
+
+- <wm_operator_invoke: invalid operator call 'NODE_OT_draw_squares'>
+    - self.layout.operator("node.draw_squares")
+    - solution: class def requires execute method.
+    - https://blender.stackexchange.com/questions/7085/error-in-addon-wm-operator-invoke-invalid-operator-call
 
 # How to
 

@@ -37,6 +37,8 @@
 - [x] 29.07.2024 25.07.2024 how to focus on outliner
 - [x] 02.08.2024 25.07.2024 how to project folder structre function split
 - [x] 02.08.2024 25.07.2024 how to import multiple files 
+- [ ] 02.08.2024 node preview on shader editor
+- [ ] 03.08.2024 debugging study
 
 # Procedure
 - log updates
@@ -44,10 +46,23 @@
 - update version and date
     - main init
     - readme
+* check commits
 - update timelog
 - push
 
+
 # Log 
+- [0.14] wip: node preview first square
+    - 05-Aug-2024 
+        - add: readme update
+        - add: docs test
+    - 03-Aug-2024 wip: node preview, reference error big
+    - 02-Aug-2024
+        - wip: node preview
+        - arch: split each function and module
+        - add: release readme.html
+        - add: readme update
+
 - [0.13] add architectre and dev environment
     - 02-Aug-2024
         - add: license, readme on addon folder
