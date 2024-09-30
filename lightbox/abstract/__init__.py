@@ -1,14 +1,10 @@
 from . import (
-    shader_ot_toggleclay,
-    view3d_ot_focusoutliner,
-    node_ot_previewdrawer,
+    nodehasher,
 )
 
 
 modules = (
-    shader_ot_toggleclay,
-    view3d_ot_focusoutliner,
-    node_ot_previewdrawer,
+    nodehasher,
     )
 
 

@@ -1,42 +1,50 @@
-
 <h1 align="center">
     Lightbox
 </h1>
-<h3 align="center">
-    Blender study add-on for various utility functions
-</h3>
 <p align="center">
-    <a href="https://kutaycoskuner.github.io/project_lightbox">Docs (Test)</a> |
-    <a href="https://github.com/kutaycoskuner/project_lightbox/issues">Report an Issue</a> 
+    Blender study add-on for various utility functions
 </p>
 
 <p align="center">
-    <span>Blender Version </span>
-    <span style="font-weight: bold;">4.2.0 </span>
-    <span style="padding: 0 .5em 0 .5em"> | </span>
-        <span>Add-on Version </span>
-    <span style="font-weight: bold;">0.14 </span>
-    <span style="padding: 0 .5em 0 .5em"> | </span>
-        <span>Project Start </span>
-    <span style="font-weight: bold;">25 Jul 2024 </span>
-    <span style="padding: 0 .5em 0 .5em"> | </span>
-        <span>Last Update </span>
-    <span style="font-weight: bold;">05 Aug 2024 </span>
+    <a href="https://kutaycoskuner.github.io/project_lightbox">Docs (Test)</a> |
+    <a href="https://github.com/kutaycoskuner/project_lightbox/issues">Bug Report / Feature Request</a> 
+</p>
+
+<p align="center">
+    <img alt="Blender 4.2.0" src="https://img.shields.io/badge/Blender-4.2.0-blue?logo=blender&logoColor=white" />
+    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.15-blue" />
+    <img alt="License" src="https://img.shields.io/badge/License-GPL%202.0%20or%20later-blue.svg" />
+    <img alt="Project Start" src="https://img.shields.io/badge/project_start-25_Jul_2024-blue" />
+    <img alt="Last Update" src="https://img.shields.io/github/last-commit/kutaycoskuner/project_lightbox" />
+</p>
+
+<p align="center">
+    <img src="_display/v0.15_clay-overlay.gif" />
 </p>
 
 # Features
-- [x] **EEVEE Clay Material Override**  
-Overrides all materials within the scene with a basic clay material. Toggles back to the original materials on button click.  
-**Access** 
-UI _View3D > Lightbox > Toggle Clay_  
 
-- [x] **Focus Selected on Outliner**  
-Focuses selected object on View3D on outliner on complex scenes.   
-**Access** 
-UI _View3D > Lightbox > Focus Outliner_  
-Keyboard _SHIFT + ALT + W_
+-   [x] **EEVEE Clay Material Override**  
+        Overrides all materials within the scene with a basic clay material. Toggles back to the original materials on button click.  
+        **Access**
+        &nbsp;
+        Interface
+        &ensp;&nbsp;
+        `View3D > Lightbox > Toggle Clay`  
+
+-   [x] **Focus Selected on Outliner**  
+        Focuses selected object on View3D on outliner on complex scenes.  
+        **Access**
+        &nbsp;
+        Interface
+        &ensp;&nbsp;
+        `View3D > Lightbox > Focus Outliner`   
+        &emsp;&emsp;&emsp;&ensp; Keyboard
+        &ensp;
+        `SHIFT + ALT + W`
 
 # Pre-Release Installation
+
 1.  Download lightbox folder from this repository.
 2.  Use a compression tool like 7-Zip to create .zip file from the folder
 3.  Open Blender version.
@@ -46,25 +54,26 @@ Keyboard _SHIFT + ALT + W_
 7.  In the top right of the Preferences window, click down arrow, then click the Install button.
 8.  Browse to the Lightbox .zip file you downloaded.
 9.  In the bottom right of the file browser, click Install Add-on.
-10.  You should now see Lightbox in the list of add-ons.
-11.  Tick the box to the left of the add-on name to enable it.
+10. You should now see Lightbox in the list of add-ons.
+11. Tick the box to the left of the add-on name to enable it.
 12. On your 3D Viewport press N to open context menus.
 13. You should be able to see Lightbox UI on right of your editor.
 
 # Work in Progress
-**Feature: Shader Editor Node Previews**   
-A small preview frames on top of each node on shader editor for better comprehension and control of node-based procedural texture creation. 
 
+**Feature: Shader Editor Node Previews**  
+A small preview frames on top of each node on shader editor for better comprehension and control of node-based procedural texture creation.
 
 # Roadmap
-**Feature: Renderqueue**   
-    A renderqueue function with an interface that allows you to set multiple camera, resolution, keyframe renders in batch.
+
+**Feature: Renderqueue**  
+ A renderqueue function with an interface that allows you to set multiple camera, resolution, keyframe renders in batch.
+
+# References
+1. This project is conducted by using various addons such as [GScatter](https://gscatter.com/gscatter) and [bakernode](https://github.com/avelgest/baker-node)
+
+2. [Blender Python API](https://docs.blender.org/api/current/index.html)
 
 
 
 <!-- [Return to top]() -->
-
-
-
-
-

@@ -22,7 +22,13 @@ class Shader_PT_Lightbox(bpy.types.Panel):
         # scene = context.scene
 
         row = layout.row()
-        row.label(text='not yet implemented')
+        row.label(text='Control: Preview Size')
+
+        row = layout.row()
+        row.label(text='Control: y margin')
+
+        row = layout.row()
+        row.label(text='Control: preview border radius')
         # row.prop(scene, "my_checkbox")
 
 

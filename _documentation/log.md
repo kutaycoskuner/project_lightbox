@@ -37,8 +37,10 @@
 - [x] 29.07.2024 25.07.2024 how to focus on outliner
 - [x] 02.08.2024 25.07.2024 how to project folder structre function split
 - [x] 02.08.2024 25.07.2024 how to import multiple files 
+- [x] 27.08.2024 03.08.2024 debugging study
+- [x] 30.09.2024 27.08.2024 readme update shields features, displays, references
 - [ ] 02.08.2024 node preview on shader editor
-- [ ] 03.08.2024 debugging study
+- [ ] 27.08.2024 add documentation for ui functions
 
 # Procedure
 - log updates
@@ -52,6 +54,29 @@
 
 
 # Log 
+- [todo]
+    - 27.08.2024 show external texture
+    - 27.08.2024 explicit return type for each function
+    - 06.09.2024 node hasher add / test
+    - 06.09.2024 opcaller add / test
+    - 06.09.2024 bake a single node
+
+- [0.15] wip node preview, readme update
+    - 30-Sep-2024
+        - add: display clay overlay
+        - chg: readme update
+        - chg: disable shader panel
+    - 27-Aug-2024 
+        - wip nodehasher
+        - inspecting bakernode addon
+    - 22-Aug-2024 
+        - wip: node preview
+        - fix: missing rna bug
+    - 06-Aug-2024
+        - add: node preview: draw square
+        - add: node preview: draw squre on top of node
+        - add: node preview: responsive to scaling and movement
+
 - [0.14] wip: node preview first square
     - 05-Aug-2024 
         - add: readme update

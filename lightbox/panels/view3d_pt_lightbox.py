@@ -10,11 +10,15 @@ class View3D_PT_Lightbox(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        # version = bl_info.get("version", (1, 0, 0))
         display_toggle_clay = str(context.scene.get(
             "clay_material_applied", False)
         )
+        
+        # toggle clay operator
         row = layout.row()
         row.operator('shader.toggle_clay_operator')
+        row.alignment = 'CENTER'
         row.label(text=display_toggle_clay)
 
         row = layout.row()
