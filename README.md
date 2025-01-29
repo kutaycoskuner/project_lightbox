@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-    <img alt="Blender 4.2.0" src="https://img.shields.io/badge/Blender-4.2.0-blue?logo=blender&logoColor=white" />
-    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.2.1-blue" />
+    <img alt="Blender 4.2.0" src="https://img.shields.io/badge/Blender-4.3.2-blue?logo=blender&logoColor=white" />
+    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.3.0-blue" />
     <img alt="License" src="https://img.shields.io/badge/License-GPL%202.0%20or%20later-blue.svg" />
     <img alt="Project Start" src="https://img.shields.io/badge/project_start-25_Jul_2024-blue" />
     <img alt="Last Update" src="https://img.shields.io/github/last-commit/kutaycoskuner/project_lightbox" />
@@ -19,6 +19,8 @@
 
 <p align="center">
     <img src="_display/v0.15_clay-overlay.gif" />
+        <br>
+    <sub><i> Eevee Clay material override</i></sub>
 </p>
 
 # Features
@@ -41,6 +43,17 @@
         &emsp;&emsp;&emsp;&ensp; Keyboard
         &ensp;
         `SHIFT + ALT + W`
+
+-   [x] **Grounding Object**  
+        Setting object center to ground to provide better control in game engines.  
+        **Access**
+        &nbsp;
+        Interface
+        &ensp;&nbsp;
+        `View3D > Lightbox > Ground Object`   
+        &emsp;&emsp;&emsp;&ensp; Keyboard
+        &ensp;
+        `SHIFT + ALT + S`
 
 # Pre-Release Installation
 
@@ -81,8 +94,6 @@ lightbox/
 ```
 
 # Work in Progress
-**Feature: Toggle volumetric center / grounding**  
-Setting object center to ground to provide better control in game engines or to center for modeling.
 
 # Roadmap
 **Feature: Shader Editor Node Previews**  

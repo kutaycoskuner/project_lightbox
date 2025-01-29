@@ -1,11 +1,14 @@
 from . import (
+    object_ot_ground_object,
     shader_ot_toggleclay,
     view3d_ot_focusoutliner,
+    
     # node_ot_previewdrawer,
 )
 
 
 modules = (
+    object_ot_ground_object,
     shader_ot_toggleclay,
     view3d_ot_focusoutliner,
     # node_ot_previewdrawer,

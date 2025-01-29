@@ -23,6 +23,9 @@ class View3D_PT_Lightbox(bpy.types.Panel):
 
         row = layout.row()
         row.operator('view3d.focus_outliner')
+        
+        row = layout.row()
+        row.operator('object.ground_object')
 
 
 classes = (
