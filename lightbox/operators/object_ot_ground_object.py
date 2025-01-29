@@ -26,15 +26,22 @@ class Object_OT_GroundObject(bpy.types.Operator):
         # Find the lowest Z vertices
         lowest_z = float('inf')
         lowest_z_vertices = []
+        tolerance = 0.1
+
+        # Get the object's world matrix for converting local to world space
+        world_matrix = obj.matrix_world
 
         for vertex in obj.data.vertices:
-            if vertex.co.z < lowest_z:
+            # Convert local vertex coordinates to world space
+            world_position = world_matrix @ vertex.co
+            
+            if world_position.z < lowest_z:
                 # Found a new lower Z, reset the vector and add this vertex
-                lowest_z = vertex.co.z
-                lowest_z_vertices = [vertex.co]
-            elif vertex.co.z == lowest_z:
+                lowest_z = world_position.z
+                lowest_z_vertices = [world_position]
+            elif abs(world_position.z - lowest_z) <= tolerance:
                 # Add to the vector if the Z value is the same or similar
-                lowest_z_vertices.append(vertex.co)
+                lowest_z_vertices.append(world_position)
 
         # If no lowest vertices found, exit
         if not lowest_z_vertices:

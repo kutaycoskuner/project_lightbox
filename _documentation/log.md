@@ -60,6 +60,11 @@
     - 20250129 job queue
     - 20250129 hasher to trace when to call function
 
+- [0.3.1] update ground object improvements
+    - 29-Jan-2025
+        - fix ground object calc based on world coords
+        - add ground object tolerance on calc
+
 - [0.3.0] add ground object operator
     - 29-Jan-2025
         - added ground object operator
