@@ -43,12 +43,13 @@
 - [ ] 27.08.2024 add documentation for ui functions
 
 # Procedure
+- add desc for function
 - log updates
 - check todo
-- update version and date
+- update version 
     - main init
     - readme
-* check commits
+- check commits
 - update timelog
 - push
 
@@ -58,6 +59,10 @@
     - 20240906 bake a single node
     - 20250129 job queue
     - 20250129 hasher to trace when to call function
+
+- [0.3.0] add ground object operator
+    - 29-Jan-2025
+        - added ground object operator
 
 - [0.2.1] refactor call system to core, version update
     - 29-Jan-2025

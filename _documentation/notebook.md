@@ -157,6 +157,14 @@ lightbox/
     - create default scene
 
 # How to
+- <add operator>
+    - add to init in ops/
+    - add .py 
+    - change name, label
+    - add in panel
+    - add in keys
+    - add logic
+
 - <change linting rules for python>
     - flake8
     - ctrl+,
