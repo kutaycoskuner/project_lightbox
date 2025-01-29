@@ -6,13 +6,12 @@
 </p>
 
 <p align="center">
-    <a href="https://kutaycoskuner.github.io/project_lightbox">Docs (Test)</a> |
     <a href="https://github.com/kutaycoskuner/project_lightbox/issues">Bug Report / Feature Request</a> 
 </p>
 
 <p align="center">
     <img alt="Blender 4.2.0" src="https://img.shields.io/badge/Blender-4.2.0-blue?logo=blender&logoColor=white" />
-    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.15-blue" />
+    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.2.1-blue" />
     <img alt="License" src="https://img.shields.io/badge/License-GPL%202.0%20or%20later-blue.svg" />
     <img alt="Project Start" src="https://img.shields.io/badge/project_start-25_Jul_2024-blue" />
     <img alt="Last Update" src="https://img.shields.io/github/last-commit/kutaycoskuner/project_lightbox" />
@@ -59,12 +58,35 @@
 12. On your 3D Viewport press N to open context menus.
 13. You should be able to see Lightbox UI on right of your editor.
 
-# Work in Progress
+# Architecture
+```plaintext
+lightbox/
+├── __init__.py                     # main entry point       
+├── core/                           # core functionality
+│   ├── __init__.py
+|   └── ...
+├── operators/                      # individual operations
+|   ├── op_operation1.py
+|   ├── op_operation2.py
+|   └── ...
+├── panels/                         # UI panels
+│   ├── main_panel.py
+│   └── subpanels/                  # optional sub-panels
+├── config/                         # property definitions
+│   ├── __init__.py
+│   └── prefs.py                    # preferences
+└── utils/                          # shared utilities
+    ├── __init__.py
+    └── helpers.py
+```
 
-**Feature: Shader Editor Node Previews**  
-A small preview frames on top of each node on shader editor for better comprehension and control of node-based procedural texture creation.
+# Work in Progress
+**Feature: Toggle volumetric center / grounding**  
+Setting object center to ground to provide better control in game engines or to center for modeling.
 
 # Roadmap
+**Feature: Shader Editor Node Previews**  
+A small preview frames on top of each node on shader editor for better comprehension and control of node-based procedural texture creation.
 
 **Feature: Renderqueue**  
  A renderqueue function with an interface that allows you to set multiple camera, resolution, keyframe renders in batch.

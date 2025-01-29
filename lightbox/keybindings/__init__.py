@@ -1,6 +1,5 @@
 import bpy
 
-
 def register():
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name='Window', space_type='EMPTY')
@@ -21,8 +20,8 @@ def unregister():
 addon_keymaps = []
 
 
-# Operator Id, key, ctl, shift, alt
 key_tuples = (
-    ('view3d.focus_outliner', 'W', False, True, True),
-    ('node.draw_squares', 'S', False, True, True),
+#    id,                            key,    ctrl,   shift,  alt
+    ('view3d.focus_outliner',       'W',    False,  True,   True),
+    ('node.draw_squares',           'S',    False,  True,   True),
 )

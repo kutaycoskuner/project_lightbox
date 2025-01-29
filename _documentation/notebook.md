@@ -94,6 +94,7 @@ lightbox/
     - pip install numpy
 
 - run
+    - cd lightbox
     - activate environment
     - f1 > start blender
 

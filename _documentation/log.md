@@ -55,11 +55,15 @@
 
 # Log 
 - [todo]
-    - 27.08.2024 show external texture
-    - 27.08.2024 explicit return type for each function
-    - 06.09.2024 node hasher add / test
-    - 06.09.2024 opcaller add / test
-    - 06.09.2024 bake a single node
+    - 20240906 bake a single node
+    - 20250129 job queue
+    - 20250129 hasher to trace when to call function
+
+- [0.2.1] refactor call system to core, version update
+    - 29-Jan-2025
+        - version update
+        - switching to semantic versioning
+        - refactor architecture to core
 
 - [0.15] wip node preview, readme update
     - 30-Sep-2024
