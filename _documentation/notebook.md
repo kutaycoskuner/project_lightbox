@@ -1,4 +1,8 @@
 # Notebook
+cd lightbox
+.\.venv\scripts\activate
+f1 > blenderstart > fix
+
 
 # Links
 - example project

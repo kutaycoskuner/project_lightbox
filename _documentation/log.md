@@ -56,9 +56,25 @@
 
 # Log 
 - [todo]
+    - 20250214 control rig generator
+    - 20250214 project object renamer / organizer 
     - 20240906 bake a single node
     - 20250129 job queue
     - 20250129 hasher to trace when to call function
+    - 
+
+- [0.4.0] chores, added origin to geometry, prototype add base rig
+    - 14-Feb-2025
+        - updated readme
+        - added add base rig operator -> currently disabled
+    - 31-Jan-2025 
+        - refactor name of operations
+        - added origin to geometry operation
+
+- [0.3.1] update ground object improvements
+    - 29-Jan-2025
+        - fix ground object calc based on world coords
+        - add ground object tolerance on calc
 
 - [0.3.0] add ground object operator
     - 29-Jan-2025

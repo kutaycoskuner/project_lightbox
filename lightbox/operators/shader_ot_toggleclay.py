@@ -12,8 +12,9 @@ def unregister():
 
 
 class Shader_OT_ToggleClay(bpy.types.Operator):
-    bl_label = "Toggle Clay Override"
-    bl_idname = "shader.toggle_clay_operator"
+    bl_label           = "Toggle Clay Override"
+    bl_description     = "Toggles clay material override in EEVEE"
+    bl_idname          = "shader.toggle_clay_operator"
     clay_material_name = "lightbox_clay"
 
     def execute(self, context):

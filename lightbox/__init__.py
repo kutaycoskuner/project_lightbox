@@ -4,13 +4,13 @@
 # ----------------------------------------------------------------------------------------
 bl_info = {
     "name": "Lightbox",
-    "description": "Various utility functionalities",
+    "description": "Various utility functions",
     "author": "Kutay Coskuner",
-    "version": (0, 3, 0),  
+    "version": (0, 4, 0),  
     "blender": (4, 3, 2),
     "location": "View3D > Tool > Lightbox",
-    "warning": "",
-    "wiki_url": "https://example.com/docs",  
+    "doc_url": "https://github.com/kutaycoskuner/project_lightbox/",  
+    "tracker_url": "https://github.com/kutaycoskuner/project_lightbox/issues",
     "category": "Misc"
 }
 
