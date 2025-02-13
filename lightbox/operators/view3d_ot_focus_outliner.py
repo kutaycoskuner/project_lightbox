@@ -12,8 +12,9 @@ def unregister():
 
 
 class View3D_OT_FocusOutliner(bpy.types.Operator):
-    bl_idname = "view3d.focus_outliner"
-    bl_label = "Focus Selected on Outliner"
+    bl_idname           = "view3d.focus_outliner"
+    bl_description      = "Focuses selected object on the outliner. Useful for complex scenes."
+    bl_label            = "Focus Selected on Outliner"
 
     def execute(self, context):
         # Get the active object

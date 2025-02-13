@@ -12,9 +12,10 @@ def unregister():
 
 
 class Object_OT_GroundObject(bpy.types.Operator):
-    bl_idname = "object.ground_object"
-    bl_label = "Ground Object"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_idname        = "object.originto_ground"
+    bl_description   = "Sets selected object origin to lowest Z median"
+    bl_label         = "Origin to Ground"
+    bl_options       = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         obj = context.object
@@ -63,6 +64,8 @@ class Object_OT_GroundObject(bpy.types.Operator):
                 
         # Reset the 3D cursor to the world origin (0, 0, 0)
         context.scene.cursor.location = mathutils.Vector((0.0, 0.0, 0.0))
+        
+        self.report({'INFO'}, f"Origin set to lowest Z median for object: {obj.name}")
 
         # self.report({'INFO'}, f"Origin set to lowest Z point: {bounding_box_min}")
         return {'FINISHED'}

@@ -25,7 +25,11 @@ class View3D_PT_Lightbox(bpy.types.Panel):
         row.operator('view3d.focus_outliner')
         
         row = layout.row()
-        row.operator('object.ground_object')
+        row.operator('object.originto_ground')
+        row.operator('object.originto_geometry') # text="Ground Object 2"
+        
+        row = layout.row()
+        row.operator('object.append_base_rig')
 
 
 classes = (

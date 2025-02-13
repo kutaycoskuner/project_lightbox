@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-    <img alt="Blender 4.2.0" src="https://img.shields.io/badge/Blender-4.3.2-blue?logo=blender&logoColor=white" />
-    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.3.0-blue" />
+    <img alt="Blender 4.3.2" src="https://img.shields.io/badge/Blender-4.3.2-blue?logo=blender&logoColor=white" />
+    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.4.0-blue" />
     <img alt="License" src="https://img.shields.io/badge/License-GPL%202.0%20or%20later-blue.svg" />
     <img alt="Project Start" src="https://img.shields.io/badge/project_start-25_Jul_2024-blue" />
     <img alt="Last Update" src="https://img.shields.io/github/last-commit/kutaycoskuner/project_lightbox" />
@@ -44,13 +44,24 @@
         &ensp;
         `SHIFT + ALT + W`
 
--   [x] **Grounding Object**  
+-   [x] **Origin to Ground**  
         Setting object center to ground to provide better control in game engines.  
         **Access**
         &nbsp;
         Interface
         &ensp;&nbsp;
-        `View3D > Lightbox > Ground Object`   
+        `View3D > Lightbox > Origin to Ground`   
+        &emsp;&emsp;&emsp;&ensp; Keyboard
+        &ensp;
+        `SHIFT + ALT + C`
+
+-   [x] **Origin to Geometry**  
+        Setting object center to geometry center to provide better control for modelling.  
+        **Access**
+        &nbsp;
+        Interface
+        &ensp;&nbsp;
+        `View3D > Lightbox > Origin to Geometry`   
         &emsp;&emsp;&emsp;&ensp; Keyboard
         &ensp;
         `SHIFT + ALT + S`
@@ -96,6 +107,12 @@ lightbox/
 # Work in Progress
 
 # Roadmap
+**Feature: Project Organization Helper**
+A directory and naming convention guide and automation tools for setting up a robust project environment.
+
+**Feature: Simple Rig Generator for Cycle Animations**
+A rig builder similar to mixamo rigs. Simplicity on implementing inverse kinematics, copy rotation, location and pole targets with separated base / control rig interfaces.
+
 **Feature: Shader Editor Node Previews**  
 A small preview frames on top of each node on shader editor for better comprehension and control of node-based procedural texture creation.
 

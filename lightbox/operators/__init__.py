@@ -1,16 +1,20 @@
 from . import (
-    object_ot_ground_object,
+    object_ot_add_baserig,
+    object_ot_originto_geometry,
+    object_ot_originto_ground,
     shader_ot_toggleclay,
-    view3d_ot_focusoutliner,
+    view3d_ot_focus_outliner,
     
     # node_ot_previewdrawer,
 )
 
 
 modules = (
-    object_ot_ground_object,
+    # object_ot_add_baserig,
+    object_ot_originto_geometry,
+    object_ot_originto_ground,
     shader_ot_toggleclay,
-    view3d_ot_focusoutliner,
+    view3d_ot_focus_outliner,
     # node_ot_previewdrawer,
     )
 
