@@ -63,6 +63,12 @@
     - 20250129 hasher to trace when to call function
     - 
 
+- [0.5.0] wip generate control rig, add version on panel
+    - 14-Feb-2025
+        - wip generate control rig: ik bones, pole targets
+        - add version on panel
+        - categorization on panel buttons
+
 - [0.4.0] chores, added origin to geometry, prototype add base rig
     - 14-Feb-2025
         - updated readme

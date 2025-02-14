@@ -61,7 +61,7 @@
         &nbsp;
         Interface
         &ensp;&nbsp;
-        `View3D > Lightbox > Origin to Geometry`   
+        `View3 > Lightbox > Origin to Geometry`   
         &emsp;&emsp;&emsp;&ensp; Keyboard
         &ensp;
         `SHIFT + ALT + S`

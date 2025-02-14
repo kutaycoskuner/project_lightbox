@@ -15,7 +15,7 @@ class Object_OT_AddBaseRig(bpy.types.Operator):
         addon_dir = os.path.dirname(os.path.abspath(__file__))
         blend_path = os.path.join(addon_dir, "../_data/", "base-rig.blend")
 
-        object_name  = "lb_armature" 
+        object_name  = "lightbox_base_humanoid" 
         directory    = blend_path + "/Armature/"
         
         try:

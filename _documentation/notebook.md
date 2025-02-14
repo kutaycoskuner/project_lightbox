@@ -31,6 +31,9 @@ f1 > blenderstart > fix
 - node preview in shader editor project
     - https://projects.blender.org/blender/blender/pulls/109120
 
+- blender addon preferences
+    - https://docs.blender.org/api/current/bpy.types.AddonPreferences.html
+
 - blender chat
     - https://blender.chat/channel/python
     - https://blender.chat/channel/blender-coders
@@ -164,7 +167,7 @@ lightbox/
 - <add operator>
     - add to init in ops/
     - add .py 
-    - change name, label
+    - change name, label in py
     - add in panel
     - add in keys
     - add logic
