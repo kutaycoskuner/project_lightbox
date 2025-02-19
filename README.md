@@ -6,12 +6,12 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/kutaycoskuner/project_lightbox/issues">Bug Report / Feature Request</a> 
+    <a href="https://github.com/kutaycoskuner/project_lightbox/issues">Bug Report or Feature Request</a> 
 </p>
 
 <p align="center">
     <img alt="Blender 4.3.2" src="https://img.shields.io/badge/Blender-4.3.2-blue?logo=blender&logoColor=white" />
-    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.5.1-blue" />
+    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.5.2-blue" />
     <img alt="License" src="https://img.shields.io/badge/License-GPL%202.0%20or%20later-blue.svg" />
     <img alt="Project Start" src="https://img.shields.io/badge/project_start-25_Jul_2024-blue" />
     <img alt="Last Update" src="https://img.shields.io/github/last-commit/kutaycoskuner/project_lightbox" />
@@ -24,6 +24,17 @@
 </p>
 
 # Features
+-   [x] **Base Cycle Rigging (experimental)**  
+        Overrides all materials within the scene with a basic clay material. Toggles back to the original materials on button click.  
+        **Access**
+        &nbsp;
+        Interface
+        &ensp;&nbsp;
+        `On viewport > shift + a > armature > Lightbox Humanoid Base Rig`  
+        &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&nbsp;
+        `Position the deformation rig joints aligned with mesh`  
+        &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&nbsp;
+        `View3D > Lightbox > Generate Control Rig`  
 
 -   [x] **EEVEE Clay Material Override**  
         Overrides all materials within the scene with a basic clay material. Toggles back to the original materials on button click.  
@@ -105,6 +116,8 @@ lightbox/
 ```
 
 # Work in Progress
+**Feature: Outliner**  
+One click non-destructable outliners for the scene
 
 # Roadmap
 **Feature: Project Organization Helper**

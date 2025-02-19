@@ -56,11 +56,18 @@
 
 # Log 
 - [todo]
-    - 20250218 rig
     - 20250214 project object renamer / organizer 
     - 20240906 bake a single node
     - 20250129 job queue
     - 20250129 hasher to trace when to call function
+
+- [0.5.2] fix parametrization on naming; hide mechanism bones
+    - 20-Feb-2025
+        - update readme
+        - scaled auto weight testing
+        - add parametrization to naming
+        - add hide mechanism bones
+        - git ignore
 
 - [0.5.1] add import control shapes, ik, pt, copy location
     - 19-Feb-2025

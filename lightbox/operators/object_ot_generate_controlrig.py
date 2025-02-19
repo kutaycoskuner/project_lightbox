@@ -92,7 +92,7 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         #       generate rig       -------------------------------------------------------
         
         base_rig_name = "lightbox_base_humanoid"
-        control_rig_prefix = "ctrl_"
+        control_rig_prefix = "lb_base_"
         control_rig_name = control_rig_prefix + base_rig_name
 
         # Ensure Object Mode
@@ -133,8 +133,15 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Rename bones in the duplicated rig with a prefix
+        control_rig.name = "lb_rig"
+        control_rig.data.name = control_rig.name
         for bone in control_rig.data.edit_bones:
-            bone.name = control_rig_prefix + bone.name
+            name_parts = bone.name.split("_")  # Split name by underscores
+            if len(name_parts) > 1:
+                last_part = name_parts.pop()  # Extract the last part
+                bone.name = control_rig_prefix + last_part  # Add prefix to the last part
+            else:
+                bone.name = control_rig_prefix + bone.name  # If no underscores, just add prefix
 
 
         def set_bone_parent(child_bone_name, parent_bone_name, inverted=False):
@@ -261,7 +268,7 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
 
             bpy.ops.object.mode_set(mode='OBJECT')  # Return to Object Mode
 
-        def set_copy_location(control_rig, target_bone_name, source_bone_name, use_tail=False, influence=1.0):
+        def set_copy_location(control_rig, target_bone_name, source_bone_name, use_tail=False, influence=1.0, use_local_space=False):
             """
             Adds a Copy Location constraint to a target bone, making it follow the source bone's head or tail.
 
@@ -280,6 +287,7 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             if not source_bone or not target_bone:
                 print(f"Error: One of the bones '{source_bone_name}' or '{target_bone_name}' was not found.")
                 return
+            
 
             # Create Copy Location constraint
             copy_location = target_bone.constraints.new(type='COPY_LOCATION')
@@ -288,9 +296,9 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             copy_location.use_offset = False  # Ensures exact positioning
             copy_location.influence = influence
 
-            # Adjust space settings
-            copy_location.owner_space = 'POSE'
-            copy_location.target_space = 'POSE'
+            space = 'LOCAL' if use_local_space else 'POSE'
+            copy_location.owner_space = space
+            copy_location.target_space = space
 
             # Adjust location based on whether to copy head or tail
             if use_tail:
@@ -300,8 +308,35 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
 
             # Return to Object Mode
             bpy.ops.object.mode_set(mode='OBJECT')
+        
+    
+        def set_copy_rotation(control_rig, target_bone_name, source_bone_name, influence=1.0, use_local_space=False, mix_mode='REPLACE'):
+            """
+            Adds a Copy Rotation constraint to a target bone, making it follow the source bone's rotation.
 
-            # print(f"Copy Location constraint added: {target_bone_name} → {source_bone_name} (Tail: {use_tail})")
+            :param control_rig: The armature object.
+            :param target_bone_name: The name of the target bone.
+            :param source_bone_name: The name of the source bone.
+            :param influence: The influence of the constraint (default is 1.0).
+            :param use_local_space: Whether to use Local Space instead of Pose Space.
+            :param mix_mode: The mix mode for the rotation ('REPLACE', 'ADD', 'AFTER', 'BEFORE').
+            """
+            bpy.ops.object.mode_set(mode='POSE')
+            
+            target_bone = control_rig.pose.bones.get(target_bone_name)
+            if not target_bone:
+                print(f"Error: Target bone '{target_bone_name}' was not found.")
+                return
+            
+            copy_rotation = target_bone.constraints.new(type='COPY_ROTATION')
+            copy_rotation.target = control_rig
+            copy_rotation.subtarget = source_bone_name
+            copy_rotation.influence = influence
+            
+            space = 'LOCAL' if use_local_space else 'POSE'
+            copy_rotation.owner_space = space
+            copy_rotation.target_space = space
+            copy_rotation.mix_mode = mix_mode
 
         def stylize_bone(bone_name, shape_key, color_index, shape_scale=1):
             """Stylizes a bone with a custom shape and assigns a color index."""
@@ -328,6 +363,7 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             
 
             bpy.ops.object.mode_set(mode='OBJECT')
+
 
         def set_pole_target(control_rig, ik_bone_name, pole_target_bone_name, pole_angle=0):
             """
@@ -362,8 +398,80 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
                 return True
             return False
 
-        def create_foot_roller(rig, source_bone_name, roller_bone_name):
-            """Creates a foot roller bone in the same direction as the source bone."""
+
+        def set_limit_rotation(control_rig, target_bone_name, min_x=None, max_x=None, min_y=None, max_y=None, min_z=None, max_z=None, use_local_space=False):
+            """
+            Adds a Limit Rotation constraint to a target bone with specified limits.
+
+            :param control_rig: The armature object.
+            :param target_bone_name: The name of the target bone.
+            :param min_x: Minimum X rotation (in degrees) or None to disable.
+            :param max_x: Maximum X rotation (in degrees) or None to disable.
+            :param min_y: Minimum Y rotation (in degrees) or None to disable.
+            :param max_y: Maximum Y rotation (in degrees) or None to disable.
+            :param min_z: Minimum Z rotation (in degrees) or None to disable.
+            :param max_z: Maximum Z rotation (in degrees) or None to disable.
+            :param use_local_space: Whether to use Local Space instead of World Space.
+            """
+            bpy.ops.object.mode_set(mode='POSE')
+            
+            target_bone = control_rig.pose.bones.get(target_bone_name)
+            if not target_bone:
+                print(f"Error: Target bone '{target_bone_name}' was not found.")
+                return
+            
+            limit_rotation = target_bone.constraints.new(type='LIMIT_ROTATION')
+            
+            if min_x is not None:
+                limit_rotation.use_limit_x = True
+                limit_rotation.min_x = math.radians(min_x)
+            if max_x is not None:
+                limit_rotation.use_limit_x = True
+                limit_rotation.max_x = math.radians(max_x)
+            if min_y is not None:
+                limit_rotation.use_limit_y = True
+                limit_rotation.min_y = math.radians(min_y)
+            if max_y is not None:
+                limit_rotation.use_limit_y = True
+                limit_rotation.max_y = math.radians(max_y)
+            if min_z is not None:
+                limit_rotation.use_limit_z = True
+                limit_rotation.min_z = math.radians(min_z)
+            if max_z is not None:
+                limit_rotation.use_limit_z = True
+                limit_rotation.max_z = math.radians(max_z)
+            
+            space = 'LOCAL' if use_local_space else 'WORLD'
+            limit_rotation.owner_space = space
+            
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+        def set_bone_roll(control_rig, bone_name, roll_degrees):
+            """
+            Sets the roll of a bone in Edit Mode.
+
+            :param control_rig: The armature object.
+            :param bone_name: The name of the bone.
+            :param roll_degrees: The desired roll in degrees.
+            """
+            # Ensure we're in Edit Mode
+            bpy.ops.object.mode_set(mode='EDIT')
+
+            # Get the bone in edit mode
+            bone = control_rig.data.edit_bones.get(bone_name)
+            if not bone:
+                print(f"Error: Bone '{bone_name}' not found.")
+                bpy.ops.object.mode_set(mode='OBJECT')
+                return
+
+            # Set the roll (convert degrees to radians)
+            bone.roll = math.radians(roll_degrees)
+
+            # Return to Object Mode
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+        def create_parallel_bone(rig, source_bone_name, parallel_bone, scale=0.5, base_head=True, reverse_direction=False, offset_scale=0, side_offset_scale=0):
+            """Creates a foot roller bone in the same direction as the source bone, with optional side offset."""
             if source_bone_name not in rig.data.bones:
                 print(f"Bone '{source_bone_name}' not found in rig.")
                 return None
@@ -375,20 +483,51 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             # Calculate direction
             bone_direction = source_bone.tail - source_bone.head
             bone_direction.normalize()
+            if reverse_direction:
+                bone_direction = -bone_direction
 
-            # Create the roller bone
-            roller_bone = eb.new(name=roller_bone_name)
-            roller_bone.head = source_bone.tail
-            roller_bone.tail = roller_bone.head + (bone_direction * source_bone.length * 0.8)
-            roller_bone.parent = source_bone
+            # Compute perpendicular direction for side offset
+            reference_axis = mathutils.Vector((0, 0, 1))  # Default reference axis
+            if abs(bone_direction.dot(reference_axis)) > 0.99:  # Check if bone is nearly parallel to Z
+                reference_axis = mathutils.Vector((0, 1, 0))  # Use Y instead
+
+            side_direction = bone_direction.cross(reference_axis)
+            side_direction.normalize()
+
+            # Compute offsets
+            offset_move = bone_direction * offset_scale * source_bone.length
+            side_offset_move = side_direction * side_offset_scale * source_bone.length
+
+            # Create the parallel bone
+            para_bone = eb.new(name=parallel_bone)
+            if base_head:
+                para_bone.head = source_bone.tail - offset_move + side_offset_move
+            else:
+                para_bone.head = source_bone.head - offset_move + side_offset_move
+
+            para_bone.tail = para_bone.head + (bone_direction * source_bone.length * scale) 
+            para_bone.use_deform = False
 
             bpy.ops.object.mode_set(mode='OBJECT')
-            # return roller_bone.name
+
+        def assignto_bone_collection(armature, bone_name, collection):
+            bpy.ops.object.mode_set(mode='EDIT')
+            bone = armature.data.edit_bones[bone_name]
+            if not bone:
+                print(f"Bone '{bone_name}' not found in armature '{armature.name}'.")
+                return
+            
+            # Assign the bone to the collection
+            collection.assign(bone)
+            print(f"Bone '{bone_name}' assigned to collection '{collection.name}'.")
+
+
+
 
         # disable main bone deform
-        main_bone = control_rig.data.edit_bones.get("ctrl_lightbox_main")
+        main_bone = control_rig.data.edit_bones.get(f"{control_rig_prefix}main")
         if main_bone: main_bone.use_deform = False
-        stylize_bone('ctrl_lightbox_main', "base", 12, 6)
+        stylize_bone(main_bone.name, "base", 12, 6)
 
         sides = [
             {"side": "L", "color_index": 4},  # Left (Blue)
@@ -399,15 +538,15 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         for data in sides:
             bpy.ops.object.mode_set(mode='EDIT')
             side = data["side"]
-            ik_bone_name = f"ctrl_lightbox_ik-hand.{side}"
-            pt_bone_name = f"ctrl_lightbox_pt-arm.{side}"
-            lower_bone_name = f"ctrl_lightbox_lower-arm.{side}"
+            ik_bone_name = f"{control_rig_prefix}ik-hand.{side}"
+            pt_bone_name = f"{control_rig_prefix}pt-arm.{side}"
+            lower_bone_name = f"{control_rig_prefix}lower-arm.{side}"
 
             # Create bones
             create_ik_bone(control_rig, lower_bone_name, ik_bone_name, "Z", 0.05)
             create_pole_target_bone(control_rig, lower_bone_name, pt_bone_name, "Y", 1, 0.04, 0.2)
             # Set hierarchy
-            set_bone_parent(ik_bone_name, "ctrl_lightbox_chest")
+            set_bone_parent(ik_bone_name, f"{control_rig_prefix}chest")
             set_bone_parent(pt_bone_name, ik_bone_name) 
             # Apply constraints
             set_ik(ik_bone_name, lower_bone_name, chain_length=2)
@@ -420,33 +559,102 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         for data in sides:
             bpy.ops.object.mode_set(mode='EDIT')
             side = data["side"]
+            
+            lower_leg_bone = f"{control_rig_prefix}lower-leg.{side}"
+            foot_bone_name = f"{control_rig_prefix}foot.{side}"
+            paw_bone_name = f"{control_rig_prefix}foot-paw.{side}"
+            
             ik_bone_name = f"ctrl_lightbox_ik-foot.{side}"
             pt_bone_name = f"ctrl_lightbox_pt-leg.{side}"
-            lower_leg_bone = f"ctrl_lightbox_lower-leg.{side}"
-            foot_bone_name = f"ctrl_lightbox_foot.{side}"
-            # foot_roller_name = f"ctrl_lightbox_foot-paw_rotator.{side}"
+            pivot_ik_name = f"ctrl_lightbox_ik-pivot-foot.{side}"
+            pivot_paw_name = f"ctrl_lightbox_ik-pivot-paw.{side}"
+            pivot_heel_name = f"ctrl_lightbox_ik-pivot-heel.{side}"
+            roll_in_name = f"ctrl_lightbox_foot-roll-in.{side}"
+            roll_out_name = f"ctrl_lightbox_foot-roll-out.{side}"
+            ctrl_foot_name = f"ctrl_lightbox_foot-controller.{side}"
+            
 
             # Create bones
-            create_ik_bone(control_rig, lower_leg_bone, ik_bone_name, "Y", 0.05)
+            #  create_ik_bone(control_rig, lower_leg_bone, ik_bone_name, "Y", 0.05)
+            create_parallel_bone(control_rig, foot_bone_name, ik_bone_name, 0.5, False)
+            create_parallel_bone(control_rig, foot_bone_name, pivot_ik_name, 0.5, True, True)
+            create_parallel_bone(control_rig, paw_bone_name, pivot_paw_name, 1.0, True, True)
+            create_parallel_bone(control_rig, pivot_paw_name, pivot_heel_name, 0.5, True, True, 1.5) 
+            create_parallel_bone(control_rig, pivot_heel_name, roll_in_name, 1.0, False, False, 0, 1.6) 
+            create_parallel_bone(control_rig, pivot_heel_name, roll_out_name, 1.0, False, False, 0, -0.6) 
+            create_parallel_bone(control_rig, pivot_heel_name, ctrl_foot_name, 2.0, False) 
             create_pole_target_bone(control_rig, lower_leg_bone, pt_bone_name, "Y", -1, 0.04, 0.2)
-            # create_foot_roller(control_rig, foot_bone_name, foot_roller_name)
+            # create_parallel_ik(control_rig, foot_bone_name, foot_roller_name)
+
+            # assign bones to collections            
+            assignto_bone_collection(control_rig, ik_bone_name,     mch_bone_collection)
+            assignto_bone_collection(control_rig, pivot_ik_name,    mch_bone_collection)
+            assignto_bone_collection(control_rig, pivot_heel_name,  mch_bone_collection)
+            assignto_bone_collection(control_rig, roll_in_name,     mch_bone_collection)
+            assignto_bone_collection(control_rig, roll_out_name, mch_bone_collection)
+            bpy.context.object.data.collections_all["mechanics_bones"].is_visible = False
             # Set hierarchy
-            set_bone_parent(ik_bone_name, "ctrl_lightbox_pelvis")
-            set_bone_parent(foot_bone_name, ik_bone_name)
-            set_bone_parent(pt_bone_name, ik_bone_name)
+            set_bone_parent(ik_bone_name, control_rig_prefix + 'pelvis')
+            set_bone_parent(ik_bone_name, pivot_ik_name)
+            set_bone_parent(pivot_ik_name, pivot_paw_name)
+            set_bone_parent(pivot_paw_name, roll_in_name)
+            set_bone_parent(roll_in_name, roll_out_name)
+            set_bone_parent(roll_out_name, pivot_heel_name)
+            set_bone_parent(pt_bone_name, ctrl_foot_name)
+            # set_bone_parent(foot_bone_name, ik_bone_name)
+            # set_bone_parent(pt_bone_name, ik_bone_name)
             # Apply constraints
             set_ik(ik_bone_name, lower_leg_bone, chain_length=2)
+            set_ik(pivot_paw_name, paw_bone_name, chain_length=1)
             set_pole_target(control_rig, lower_leg_bone, pt_bone_name, -90)
-            set_copy_location(control_rig, foot_bone_name, lower_leg_bone, True)
+            # set_copy_location(control_rig, foot_bone_name, ik_bone_name)
+            set_copy_rotation(control_rig, foot_bone_name, ik_bone_name)
+            
+            set_copy_location(control_rig, pivot_heel_name, ctrl_foot_name)
+            # set_copy_location(control_rig, pt_bone_name, ctrl_foot_name, use_local_space=True)
+            # set_copy_rotation(control_rig, pt_bone_name, ctrl_foot_name, use_local_space=True)
+            set_copy_rotation(control_rig, pivot_heel_name, ctrl_foot_name, use_local_space=True, mix_mode="AFTER")
+            set_copy_rotation(control_rig, pivot_ik_name, ctrl_foot_name, use_local_space=True, mix_mode="AFTER")
+            set_copy_rotation(control_rig, roll_in_name, ctrl_foot_name, use_local_space=True, mix_mode="AFTER")
+            set_copy_rotation(control_rig, roll_out_name, ctrl_foot_name, use_local_space=True, mix_mode="AFTER")
+            set_limit_rotation(control_rig, pivot_heel_name, 0, 45, use_local_space=True)
+            set_bone_roll(control_rig, pivot_ik_name, -180)
+            set_limit_rotation(control_rig, pivot_ik_name, -45, 0, use_local_space=True)
+            set_limit_rotation(control_rig, roll_in_name, min_y=0, max_y=45, use_local_space=True)
+            set_limit_rotation(control_rig, roll_out_name, min_y=-45, max_y=0, use_local_space=True)
+            
+            bpy.context.object.pose.bones[pivot_ik_name].constraints["Copy Rotation"].use_y = False
+            bpy.context.object.pose.bones[pivot_ik_name].constraints["Copy Rotation"].use_z = False
+            bpy.context.object.pose.bones[pivot_heel_name].constraints["Copy Rotation"].use_y = False
+            bpy.context.object.pose.bones[roll_in_name].constraints["Copy Rotation"].use_x = False
+            bpy.context.object.pose.bones[roll_in_name].constraints["Copy Rotation"].use_y = True
+            bpy.context.object.pose.bones[roll_in_name].constraints["Copy Rotation"].use_z = False
+            bpy.context.object.pose.bones[roll_out_name].constraints["Copy Rotation"].use_x = False
+            bpy.context.object.pose.bones[roll_out_name].constraints["Copy Rotation"].use_y = True
+            bpy.context.object.pose.bones[roll_out_name].constraints["Copy Rotation"].use_z = False
+            
+            
             # Stylize bones 
-            # stylize_bone(ik_bone_name, "foot_box", 9)
+            stylize_bone(ctrl_foot_name, "ik_hand", 9)
+            stylize_bone(pivot_paw_name, "end", 9)
             stylize_bone(pt_bone_name, "pole_target", 7)
-            # stylize_bone(foot_roller_name, "rotator", 3)
+            
+            bpy.ops.object.mode_set(mode='POSE')
+            paw_bone = control_rig.pose.bones.get(pivot_paw_name)
+            if paw_bone:
+                paw_bone.custom_shape_rotation_euler[0] = 2.2340
+            heel_bone = control_rig.pose.bones.get(ctrl_foot_name)
+            if heel_bone:
+                heel_bone.custom_shape_translation[2] = 0.0275
+
+            
 
 
             
         # Return to Object Mode
         bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode='POSE')
+        
         self.report({'INFO'}, "Control rig generated successfully")
         return {'FINISHED'}
 
