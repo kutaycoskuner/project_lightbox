@@ -6,7 +6,7 @@ bl_info = {
     "name": "Lightbox",
     "description": "Various utility functions",
     "author": "Kutay Coskuner",
-    "version": (0, 5, 0),  
+    "version": (0, 5, 1),  
     "blender": (4, 3, 2),
     "warning": "",
     "location": "View3D > Tool > Lightbox",

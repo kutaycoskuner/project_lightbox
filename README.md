@@ -11,7 +11,7 @@
 
 <p align="center">
     <img alt="Blender 4.3.2" src="https://img.shields.io/badge/Blender-4.3.2-blue?logo=blender&logoColor=white" />
-    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.4.0-blue" />
+    <img alt="Addon Version" src="https://img.shields.io/badge/Addon_Version-0.5.1-blue" />
     <img alt="License" src="https://img.shields.io/badge/License-GPL%202.0%20or%20later-blue.svg" />
     <img alt="Project Start" src="https://img.shields.io/badge/project_start-25_Jul_2024-blue" />
     <img alt="Last Update" src="https://img.shields.io/github/last-commit/kutaycoskuner/project_lightbox" />

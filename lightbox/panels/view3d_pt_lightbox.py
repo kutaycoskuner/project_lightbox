@@ -42,7 +42,7 @@ class View3D_PT_Lightbox(bpy.types.Panel):
         row.operator('object.originto_geometry') # text="Ground Object 2"
 
         # Rigging Section
-        layout.label(text="Rigging")
+        layout.label(text="Rigging (experimental)")
         row = layout.row()
         row.operator('object.generate_control_rig')
 

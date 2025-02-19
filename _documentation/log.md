@@ -56,12 +56,23 @@
 
 # Log 
 - [todo]
-    - 20250214 control rig generator
+    - 20250218 rig
     - 20250214 project object renamer / organizer 
     - 20240906 bake a single node
     - 20250129 job queue
     - 20250129 hasher to trace when to call function
-    - 
+
+- [0.5.1] add import control shapes, ik, pt, copy location
+    - 19-Feb-2025
+        - wip paw rotator bone
+    - 18-Feb-2025
+        - fix main deform disable
+        - add import control shapes
+        - add ik, pole target, foot copy location 
+    - 17-Feb-2025
+        - fix: generate control rig ik problem
+    - 16-Feb-2025
+        - wip: blender dev environment server pid problem: no result
 
 - [0.5.0] wip generate control rig, add version on panel
     - 14-Feb-2025

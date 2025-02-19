@@ -1,6 +1,7 @@
 import bpy
 import mathutils
 import math
+import os
 
 class Object_OT_GenerateControlRig(bpy.types.Operator):
     bl_idname = "object.generate_control_rig"
@@ -8,7 +9,88 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
     bl_description = "Generates a control rig from the Lightbox base rig"
     bl_options = {'REGISTER', 'UNDO'}
 
+
+    def import_control_shapes(self):
+        # Check if the control shapes collection already exists at scene root
+        if bpy.data.collections.get("control-shapes"):
+            self.report({'INFO'}, "Control shapes already imported.")
+            return
+
+        # Ensure we are in Object Mode
+        if bpy.context.object and bpy.context.object.mode != 'OBJECT':
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+        # Define the path to the blend file inside the addon
+        addon_dir = os.path.dirname(os.path.abspath(__file__))
+        blend_path = os.path.join(addon_dir, "../_data/", "control-shapes.blend")
+        # The imported structure has a top-level collection "_lightbox"
+        object_name  = "_lightbox" 
+        directory    = os.path.join(blend_path, "Collection")  # Use os.path.join for better compatibility
+
+        try:
+            bpy.ops.wm.append(
+                filepath=blend_path,
+                directory=directory,
+                filename=object_name,
+                link=False  # False means we copy it into the current blend file
+            )
+            self.report({'INFO'}, "Added lightbox control shapes")
+        except RuntimeError as e:
+            self.report({'ERROR'}, f"Failed to add lightbox control shapes: {str(e)}")
+            return {'CANCELLED'}
+
+        # At this point, the file brings in a collection structure:
+        # _lightbox
+        #   └── control-shapes
+        # We want to isolate the control shapes into their own collection at the scene root and hide it.
+        self.isolate_subcollection(parent_collection_name="_lightbox", subcollection_name="control-shapes")
+
+    def isolate_subcollection(self, parent_collection_name, subcollection_name):
+        """
+        Moves the objects from a subcollection (subcollection_name) that is inside a parent (parent_collection_name)
+        into a new collection at the scene root (with the same subcollection_name), then hides the new collection.
+        """
+        parent_col = bpy.data.collections.get(parent_collection_name)
+        if parent_col is None:
+            self.report({'ERROR'}, f"Parent collection '{parent_collection_name}' not found.")
+            return
+
+        source_subcol = parent_col.children.get(subcollection_name)
+        if source_subcol is None:
+            self.report({'INFO'}, f"Subcollection '{subcollection_name}' not found in '{parent_collection_name}'.")
+            return
+
+        # Create a new collection for control shapes at the scene root if it doesn't exist already.
+        new_col = bpy.data.collections.get(subcollection_name)
+        if new_col is None:
+            new_col = bpy.data.collections.new(name=subcollection_name)
+            bpy.context.scene.collection.children.link(new_col)
+
+        # Move objects from source_subcol into new_col
+        for obj in list(source_subcol.objects):
+            # Unlink from the source subcollection
+            source_subcol.objects.unlink(obj)
+            # Link to the new collection if not already linked
+            if obj.name not in new_col.objects:
+                new_col.objects.link(obj)
+
+        # Optionally, remove the now-empty source subcollection from the parent.
+        if source_subcol.users == 0 or len(source_subcol.objects) == 0:
+            parent_col.children.unlink(source_subcol)
+            bpy.data.collections.remove(source_subcol)
+
+        # Hide the new collection so that control shapes are not visible in viewport or render.
+        new_col.hide_viewport = True
+        new_col.hide_render = True
+        self.report({'INFO'}, f"Isolated and hidden subcollection '{subcollection_name}' at scene root.")
+
     def execute(self, context):
+        
+        #       import control shapes       ----------------------------------------------
+        self.import_control_shapes()
+                
+        #       generate rig       -------------------------------------------------------
+        
         base_rig_name = "lightbox_base_humanoid"
         control_rig_prefix = "ctrl_"
         control_rig_name = control_rig_prefix + base_rig_name
@@ -30,9 +112,15 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
 
         # Duplicate the base rig
         control_rig = base_rig.copy()
-        control_rig.data = base_rig.data.copy()
+        control_rig.data =  base_rig.data.copy()
         control_rig.name = control_rig_name
         bpy.context.collection.objects.link(control_rig)
+
+        # bone groups
+        ctrl_bone_collection = control_rig.data.collections.new(name='control_bones')
+        def_bone_collection = control_rig.data.collections.new(name='deformation_bones')
+        mch_bone_collection = control_rig.data.collections.new(name='mechanics_bones')
+        
 
         # Disable base rig visibility
         base_rig.hide_set(True)
@@ -48,14 +136,20 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         for bone in control_rig.data.edit_bones:
             bone.name = control_rig_prefix + bone.name
 
-        def set_bone_parent(child_bone_name, parent_bone_name):
+
+        def set_bone_parent(child_bone_name, parent_bone_name, inverted=False):
             """Sets the parent of a bone without connecting it."""
             parent_bone = control_rig.data.edit_bones.get(parent_bone_name)
             child_bone  = control_rig.data.edit_bones.get(child_bone_name)
+            
+            if child_bone and inverted:
+                child_bone.use_connect = True   
+            elif child_bone: 
+                child_bone.use_connect = False   # disconnect means offset
+            
             if child_bone and parent_bone:
                 child_bone.parent = parent_bone
-                child_bone.use_connect = False  # Prevent automatic connection
-                
+
         def create_ik_bone(control_rig, source_bone_name, ik_bone_name, extension_axis="Z", extension_factor=0.05):
             """
             Creates an IK bone based on a source bone.
@@ -88,9 +182,11 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
                 extension_vector.z = ik_length
 
             ik_bone.tail = source_bone.tail + extension_vector
-
+            
+            ik_bone.use_deform = False
+            ctrl_bone_collection.assign(ik_bone)
+            
             return ik_bone
-
 
         def create_pole_target_bone(control_rig, source_bone_name, pole_target_bone_name, direction_axis, direction=1, distance_fraction=0.04, distance_of_bone=0.2):
             """
@@ -143,10 +239,12 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
                 # Unparent the pole target to ensure it's not connected to any other bones
                 pole_target_bone.parent = None
                 pole_target_bone.use_connect = False
+                
+                pole_target_bone.use_deform = False
+                ctrl_bone_collection.assign(pole_target_bone)
 
                 return pole_target_bone
             return None
-
 
         def set_ik(ik_bone_name, constraint_bone_name, chain_length):
             """Adds an IK constraint to a bone."""
@@ -163,7 +261,49 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
 
             bpy.ops.object.mode_set(mode='OBJECT')  # Return to Object Mode
 
-        def stylize_bone(bone_name, shape_key, color_index):
+        def set_copy_location(control_rig, target_bone_name, source_bone_name, use_tail=False, influence=1.0):
+            """
+            Adds a Copy Location constraint to a target bone, making it follow the source bone's head or tail.
+
+            :param control_rig: The armature object.
+            :param source_bone_name: The name of the source bone.
+            :param target_bone_name: The name of the target bone.
+            :param use_tail: If True, the target will copy the tail location of the source bone.
+            :param influence: The influence of the constraint (default is 1.0).
+            """
+            # Ensure we're in Pose Mode
+            bpy.ops.object.mode_set(mode='POSE')
+
+            source_bone = control_rig.pose.bones.get(source_bone_name)
+            target_bone = control_rig.pose.bones.get(target_bone_name)
+
+            if not source_bone or not target_bone:
+                print(f"Error: One of the bones '{source_bone_name}' or '{target_bone_name}' was not found.")
+                return
+
+            # Create Copy Location constraint
+            copy_location = target_bone.constraints.new(type='COPY_LOCATION')
+            copy_location.target = control_rig
+            copy_location.subtarget = source_bone_name
+            copy_location.use_offset = False  # Ensures exact positioning
+            copy_location.influence = influence
+
+            # Adjust space settings
+            copy_location.owner_space = 'POSE'
+            copy_location.target_space = 'POSE'
+
+            # Adjust location based on whether to copy head or tail
+            if use_tail:
+                copy_location.head_tail = 1.0  # Copy tail location
+            else:
+                copy_location.head_tail = 0.0  # Copy head location
+
+            # Return to Object Mode
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+            # print(f"Copy Location constraint added: {target_bone_name} → {source_bone_name} (Tail: {use_tail})")
+
+        def stylize_bone(bone_name, shape_key, color_index, shape_scale=1):
             """Stylizes a bone with a custom shape and assigns a color index."""
             bpy.ops.object.mode_set(mode='POSE')
 
@@ -175,11 +315,17 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             shape_object = bpy.data.objects.get(shape_key)
             if shape_object:
                 pose_bone.custom_shape = shape_object
+                pose_bone.custom_shape_scale_xyz[0] = shape_scale
+                pose_bone.custom_shape_scale_xyz[1] = shape_scale
+                pose_bone.custom_shape_scale_xyz[2] = shape_scale
             
             # Validate and clamp the color index (Blender supports 0–31)
             color_index = max(0, min(color_index, 20))
             # set color to bone
             bpy.context.object.data.bones[bone_name].color.palette = f"THEME{color_index:02d}"
+            bpy.context.object.pose.bones[bone_name].color.palette = f"THEME{color_index:02d}"
+            
+            
 
             bpy.ops.object.mode_set(mode='OBJECT')
 
@@ -216,31 +362,60 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
                 return True
             return False
 
+        def create_foot_roller(rig, source_bone_name, roller_bone_name):
+            """Creates a foot roller bone in the same direction as the source bone."""
+            if source_bone_name not in rig.data.bones:
+                print(f"Bone '{source_bone_name}' not found in rig.")
+                return None
+
+            bpy.ops.object.mode_set(mode='EDIT')
+            eb = rig.data.edit_bones
+            source_bone = eb[source_bone_name]
+
+            # Calculate direction
+            bone_direction = source_bone.tail - source_bone.head
+            bone_direction.normalize()
+
+            # Create the roller bone
+            roller_bone = eb.new(name=roller_bone_name)
+            roller_bone.head = source_bone.tail
+            roller_bone.tail = roller_bone.head + (bone_direction * source_bone.length * 0.8)
+            roller_bone.parent = source_bone
+
+            bpy.ops.object.mode_set(mode='OBJECT')
+            # return roller_bone.name
+
+        # disable main bone deform
+        main_bone = control_rig.data.edit_bones.get("ctrl_lightbox_main")
+        if main_bone: main_bone.use_deform = False
+        stylize_bone('ctrl_lightbox_main', "base", 12, 6)
 
         sides = [
             {"side": "L", "color_index": 4},  # Left (Blue)
             {"side": "R", "color_index": 4}   # Right (Red)
         ]
         
-        # foot ik
+        # hand ik
         for data in sides:
             bpy.ops.object.mode_set(mode='EDIT')
             side = data["side"]
             ik_bone_name = f"ctrl_lightbox_ik-hand.{side}"
             pt_bone_name = f"ctrl_lightbox_pt-arm.{side}"
-            lower_arm_bone = f"ctrl_lightbox_lower-arm.{side}"
+            lower_bone_name = f"ctrl_lightbox_lower-arm.{side}"
 
-            # Create IK Bone
-            create_ik_bone(control_rig, lower_arm_bone, ik_bone_name, "Z", 0.05)
-            create_pole_target_bone(control_rig, lower_arm_bone, pt_bone_name, "Y", 1, 0.04, 0.2)
-            # Set Parent
+            # Create bones
+            create_ik_bone(control_rig, lower_bone_name, ik_bone_name, "Z", 0.05)
+            create_pole_target_bone(control_rig, lower_bone_name, pt_bone_name, "Y", 1, 0.04, 0.2)
+            # Set hierarchy
             set_bone_parent(ik_bone_name, "ctrl_lightbox_chest")
-            # Apply IK Constraints
-            set_ik(ik_bone_name, lower_arm_bone, chain_length=2)
-            set_pole_target(control_rig, lower_arm_bone, pt_bone_name, -90)
-            # Stylize IK Bone
-            stylize_bone(ik_bone_name, "ik_handle_shape", data["color_index"])
-        
+            set_bone_parent(pt_bone_name, ik_bone_name) 
+            # Apply constraints
+            set_ik(ik_bone_name, lower_bone_name, chain_length=2)
+            set_pole_target(control_rig, lower_bone_name, pt_bone_name, -125)
+            # Stylize bones
+            stylize_bone(ik_bone_name, "ik_hand", 9)
+            stylize_bone(pt_bone_name, "pole_target", 7)
+            
         # foot ik
         for data in sides:
             bpy.ops.object.mode_set(mode='EDIT')
@@ -248,21 +423,30 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             ik_bone_name = f"ctrl_lightbox_ik-foot.{side}"
             pt_bone_name = f"ctrl_lightbox_pt-leg.{side}"
             lower_leg_bone = f"ctrl_lightbox_lower-leg.{side}"
+            foot_bone_name = f"ctrl_lightbox_foot.{side}"
+            # foot_roller_name = f"ctrl_lightbox_foot-paw_rotator.{side}"
 
-            # Create IK Bone
+            # Create bones
             create_ik_bone(control_rig, lower_leg_bone, ik_bone_name, "Y", 0.05)
             create_pole_target_bone(control_rig, lower_leg_bone, pt_bone_name, "Y", -1, 0.04, 0.2)
-            # Set Parent
+            # create_foot_roller(control_rig, foot_bone_name, foot_roller_name)
+            # Set hierarchy
             set_bone_parent(ik_bone_name, "ctrl_lightbox_pelvis")
-            # Apply IK Constraints
+            set_bone_parent(foot_bone_name, ik_bone_name)
+            set_bone_parent(pt_bone_name, ik_bone_name)
+            # Apply constraints
             set_ik(ik_bone_name, lower_leg_bone, chain_length=2)
-            set_pole_target(control_rig, lower_leg_bone, pt_bone_name)
-            # Stylize IK Bone
-            stylize_bone(ik_bone_name, "ik_handle_shape", data["color_index"])    
+            set_pole_target(control_rig, lower_leg_bone, pt_bone_name, -90)
+            set_copy_location(control_rig, foot_bone_name, lower_leg_bone, True)
+            # Stylize bones 
+            # stylize_bone(ik_bone_name, "foot_box", 9)
+            stylize_bone(pt_bone_name, "pole_target", 7)
+            # stylize_bone(foot_roller_name, "rotator", 3)
+
+
             
         # Return to Object Mode
         bpy.ops.object.mode_set(mode='OBJECT')
-
         self.report({'INFO'}, "Control rig generated successfully")
         return {'FINISHED'}
 

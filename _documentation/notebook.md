@@ -57,18 +57,6 @@ f1 > blenderstart > fix
 - bpy_struct ImagePreview
     - https://docs.blender.org/api/current/bpy.types.ImagePreview.html
 
-# Structure
-lightbox/
--   abstract/
-    - nodehasher.py
--   panels/
--   operators/
-    -  __init__.py
-    -  module1.py
-    -  module2.py
--  shortcuts/
-    -  __init__.py
--  __init__.py
 
 # Naming convention
     - prefix _ is to indicate private
@@ -206,6 +194,34 @@ lightbox/
         - in: self.draw_square
 
 # Problems
+- <vsc: server[pid=20976] is already being debugged.>
+    - output > sag tarafta drop down var
+        - python ve vs intellicode a bak bazi hatalar goreceksin
+        - python dan
+            - 2025-02-16 14:56:44.959 [error] sendStartupTelemetry() failed. [l [Error]: Failed to resolve env "d:\\SteamLibrary\\steamapps\\common\\Blender\\4.2\\python\\bin\\python.exe"
+                at ae (c:\Users\kutay\.vscode\extensions\ms-python.python-2025.0.0-win32-x64\out\client\extension.js:2:1973990)
+                at oe (c:\Users\kutay\.vscode\extensions\ms-python.python-2025.0.0-win32-x64\out\client\extension.js:2:1971950)
+                at Immediate.<anonymous> (c:\Users\kutay\.vscode\extensions\ms-python.python-2025.0.0-win32-x64\out\client\extension.js:2:1968244)
+                at process.processImmediate (node:internal/timers:483:21)] {
+            code: -4,
+            data: undefined
+            }
+        - steaam blenderdaki python i gormuyor ya da versiyon uyusmazligi var
+        - open blender > go to scripting
+        import sys
+        print(sys.executable)
+        - set given as vs default interpreter
+        - ctrl + shift + p 
+            - python select interpreter
+                - blender printter aldigin degeri yapistir
+    - portlari kapat
+    - powershell: netstat -ano | findstr LISTENING
+    - tasklist | findstr python -> eger altta bir deger gosterirse
+    - taskkill /IM python.exe /F
+    - Get-Process -Id 20976
+    - Stop-Process -Id 20976 -Force
+    - taskkill /PID 20976 /F
+
 - <accessing shader editor zoom level>
     - https://blenderartists.org/t/node-editor-zoom-level/1478930/2
 
