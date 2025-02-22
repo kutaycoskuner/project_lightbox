@@ -61,6 +61,13 @@
     - 20250129 job queue
     - 20250129 hasher to trace when to call function
 
+- [0.6.0] add scaled armature weight operator, deformation control and shapes
+    - 22-Feb-2025
+        - add scaled armature weight operator
+        - added all deformation control and shapes
+        - adding deformation controll
+        - add fast switch between lightbox panel and item
+
 - [0.5.2] fix parametrization on naming; hide mechanism bones
     - 20-Feb-2025
         - update readme

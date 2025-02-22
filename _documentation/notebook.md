@@ -152,9 +152,15 @@ f1 > blenderstart > fix
     - create default scene
 
 # How to
+- <printing out data structure>
+    - print(dir(area.regions[5]))
+    - for prop in bpy.types.Region.bl_rna.properties:
+        print(prop.identifier)
+    - sidebar_tabs = {panel.bl_category for panel in bpy.types.Panel.__subclasses__() if hasattr(panel, "bl_category")}
+
 - <add operator>
-    - add to init in ops/
     - add .py 
+    - add to init in ops/
     - change name, label in py
     - add in panel
     - add in keys
@@ -248,7 +254,6 @@ f1 > blenderstart > fix
     - https://blender.stackexchange.com/questions/7085/error-in-addon-wm-operator-invoke-invalid-operator-call
 
 
-# How to
 
 # Analysis
 - bakernode

@@ -92,8 +92,8 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         #       generate rig       -------------------------------------------------------
         
         base_rig_name = "lightbox_base_humanoid"
-        control_rig_prefix = "lb_base_"
-        control_rig_name = control_rig_prefix + base_rig_name
+        control_rig_prefix = "def_"
+        control_rig_name = "Lightbox Control Rig"
 
         # Ensure Object Mode
         if bpy.context.object and bpy.context.object.mode != 'OBJECT':
@@ -128,12 +128,15 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         # Select and set active control rig
         bpy.context.view_layer.objects.active = control_rig
         control_rig.select_set(True)
+        
+        for bone in control_rig.data.bones:
+            def_bone_collection.assign(bone)
 
         # Set Edit Mode
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Rename bones in the duplicated rig with a prefix
-        control_rig.name = "lb_rig"
+        control_rig.name = control_rig_name
         control_rig.data.name = control_rig.name
         for bone in control_rig.data.edit_bones:
             name_parts = bone.name.split("_")  # Split name by underscores
@@ -146,6 +149,7 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
 
         def set_bone_parent(child_bone_name, parent_bone_name, inverted=False):
             """Sets the parent of a bone without connecting it."""
+            bpy.ops.object.mode_set(mode='EDIT')
             parent_bone = control_rig.data.edit_bones.get(parent_bone_name)
             child_bone  = control_rig.data.edit_bones.get(child_bone_name)
             
@@ -521,13 +525,117 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             collection.assign(bone)
             print(f"Bone '{bone_name}' assigned to collection '{collection.name}'.")
 
+        def create_control_bone_from_deformation(control_rig, deformation_bone_name, control_bone_name):
+            """
+            Creates a new control bone from an existing deformation bone, removes its deformation,
+            assigns it to the control collection, and applies control transformations to the deformation bone.
 
+            :param control_rig: The armature object.
+            :param deformation_bone_name: The name of the deformation bone to copy.
+            :param control_bone_name: The name of the new control bone.
+            """
+            # Ensure we're in Edit Mode
+            bpy.ops.object.mode_set(mode='EDIT')
+
+            # Get the deformation bone
+            deformation_bone = control_rig.data.edit_bones.get(deformation_bone_name)
+            if not deformation_bone:
+                print(f"Error: Deformation bone '{deformation_bone_name}' not found.")
+                return
+
+            # Create a new bone as a copy of the deformation bone
+            control_bone = control_rig.data.edit_bones.new(control_bone_name)
+            control_bone.head = deformation_bone.head
+            control_bone.tail = deformation_bone.tail
+            control_bone.roll = deformation_bone.roll
+            control_bone.use_deform = False  # Remove deformation
+
+            # Assign the new bone to the control collection
+            ctrl_bone_collection = control_rig.data.collections.get('control_bones')
+            if ctrl_bone_collection:
+                ctrl_bone_collection.assign(control_bone)
+
+            # Return to Object Mode
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+            # Apply control transformations to the deformation bone
+            bpy.ops.object.mode_set(mode='POSE')
+            pose_bone = control_rig.pose.bones.get(deformation_bone_name)
+            if pose_bone:
+                # Add a Copy Transforms constraint
+                copy_transforms = pose_bone.constraints.new(type='COPY_TRANSFORMS')
+                copy_transforms.target = control_rig
+                copy_transforms.subtarget = control_bone_name
 
 
         # disable main bone deform
         main_bone = control_rig.data.edit_bones.get(f"{control_rig_prefix}main")
         if main_bone: main_bone.use_deform = False
         stylize_bone(main_bone.name, "base", 12, 6)
+
+        # create basic ctrl def bones
+        bone_name = "_pelvis"
+        def_bone_name = f"def{bone_name}"
+        ctrl_bone_name = f"ctrl{bone_name}"
+        create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
+        stylize_bone(ctrl_bone_name, "general_square", 12, 2)
+        ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+        ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)   
+        
+        bone_name = "_spine01"
+        def_bone_name = f"def{bone_name}"
+        ctrl_bone_name = f"ctrl{bone_name}"
+        create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
+        stylize_bone(ctrl_bone_name, "general_circle", 12, 1.5)
+        ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+        ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)   
+        parent_name = "def_pelvis"
+        set_bone_parent(ctrl_bone_name, parent_name)
+        
+        bone_name = "_spine02"
+        def_bone_name = f"def{bone_name}"
+        ctrl_bone_name = f"ctrl{bone_name}"
+        create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
+        stylize_bone(ctrl_bone_name, "general_circle", 12, 1.55)
+        ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+        ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)   
+        parent_name = "def_pelvis"
+        set_bone_parent(ctrl_bone_name, parent_name)
+        
+        
+        bone_name = "_chest"
+        def_bone_name = f"def{bone_name}"
+        ctrl_bone_name = f"ctrl{bone_name}"
+        create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
+        stylize_bone(ctrl_bone_name, "general_circle", 12, 1.2)
+        ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+        ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)  
+        parent_name = "def_pelvis"
+        set_bone_parent(ctrl_bone_name, parent_name)
+        
+        bone_name = "_neck02"
+        def_bone_name = f"def{bone_name}"
+        ctrl_bone_name = f"ctrl{bone_name}"
+        create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
+        stylize_bone(ctrl_bone_name, "general_circle", 12, 1.2)
+        ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+        ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)  
+        parent_name = "def_chest"
+        set_bone_parent(ctrl_bone_name, parent_name)
+        
+        bone_name = "_head"
+        def_bone_name = f"def{bone_name}"
+        ctrl_bone_name = f"ctrl{bone_name}"
+        # mch_bone_name = f"mch_ik{bone_name}"
+        create_parallel_bone(control_rig, def_bone_name, ctrl_bone_name, 0.5, True)
+        set_ik(ctrl_bone_name, def_bone_name, 1)
+        bpy.context.object.pose.bones[def_bone_name].constraints["IK"].use_rotation = True
+        stylize_bone(ctrl_bone_name, "general_circle", 12, 1.2)
+        stylize_bone(ctrl_bone_name, "general_circle", 9, 1.2)
+        ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+        ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)  
+        parent_name = "def_chest"
+        set_bone_parent(ctrl_bone_name, parent_name)
 
         sides = [
             {"side": "L", "color_index": 4},  # Left (Blue)
@@ -550,10 +658,30 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             set_bone_parent(pt_bone_name, ik_bone_name) 
             # Apply constraints
             set_ik(ik_bone_name, lower_bone_name, chain_length=2)
-            set_pole_target(control_rig, lower_bone_name, pt_bone_name, -125)
+            set_pole_target(control_rig, lower_bone_name, pt_bone_name, -60)
             # Stylize bones
             stylize_bone(ik_bone_name, "ik_hand", 9)
             stylize_bone(pt_bone_name, "pole_target", 7)
+            
+            bone_name = f"_hand-palm.{side}"
+            def_bone_name = f"def{bone_name}"
+            ctrl_bone_name = f"ctrl{bone_name}"
+            create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
+            stylize_bone(ctrl_bone_name, "general_circle", 12, .5)
+            ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+            ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)  
+            parent_name = ik_bone_name
+            set_bone_parent(ctrl_bone_name, parent_name)
+            
+            bone_name = f"_hand-claw.{side}"
+            def_bone_name = f"def{bone_name}"
+            ctrl_bone_name = f"ctrl{bone_name}"
+            create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
+            stylize_bone(ctrl_bone_name, "general_circle", 12, .5)
+            ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+            ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)  
+            parent_name = f"ctrl_hand-palm.{side}"
+            set_bone_parent(ctrl_bone_name, parent_name)
             
         # foot ik
         for data in sides:
@@ -564,14 +692,14 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             foot_bone_name = f"{control_rig_prefix}foot.{side}"
             paw_bone_name = f"{control_rig_prefix}foot-paw.{side}"
             
-            ik_bone_name = f"ctrl_lightbox_ik-foot.{side}"
-            pt_bone_name = f"ctrl_lightbox_pt-leg.{side}"
-            pivot_ik_name = f"ctrl_lightbox_ik-pivot-foot.{side}"
-            pivot_paw_name = f"ctrl_lightbox_ik-pivot-paw.{side}"
-            pivot_heel_name = f"ctrl_lightbox_ik-pivot-heel.{side}"
-            roll_in_name = f"ctrl_lightbox_foot-roll-in.{side}"
-            roll_out_name = f"ctrl_lightbox_foot-roll-out.{side}"
-            ctrl_foot_name = f"ctrl_lightbox_foot-controller.{side}"
+            ik_bone_name = f"mch_ik-foot.{side}"
+            pt_bone_name = f"ctrl_poletarget-leg.{side}"
+            pivot_ik_name = f"mch_ik-pivot-foot.{side}"
+            pivot_paw_name = f"ctrl_pivot-paw.{side}"
+            pivot_heel_name = f"mch_ik-pivot-heel.{side}"
+            roll_in_name = f"mch_foot-roll-in.{side}"
+            roll_out_name = f"mch_foot-roll-out.{side}"
+            ctrl_foot_name = f"ctrl_foot-controller.{side}"
             
 
             # Create bones
@@ -592,7 +720,7 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             assignto_bone_collection(control_rig, pivot_heel_name,  mch_bone_collection)
             assignto_bone_collection(control_rig, roll_in_name,     mch_bone_collection)
             assignto_bone_collection(control_rig, roll_out_name, mch_bone_collection)
-            bpy.context.object.data.collections_all["mechanics_bones"].is_visible = False
+
             # Set hierarchy
             set_bone_parent(ik_bone_name, control_rig_prefix + 'pelvis')
             set_bone_parent(ik_bone_name, pivot_ik_name)
@@ -633,7 +761,6 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             bpy.context.object.pose.bones[roll_out_name].constraints["Copy Rotation"].use_y = True
             bpy.context.object.pose.bones[roll_out_name].constraints["Copy Rotation"].use_z = False
             
-            
             # Stylize bones 
             stylize_bone(ctrl_foot_name, "ik_hand", 9)
             stylize_bone(pivot_paw_name, "end", 9)
@@ -648,7 +775,8 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
                 heel_bone.custom_shape_translation[2] = 0.0275
 
             
-
+        bpy.context.object.data.collections_all["mechanics_bones"].is_visible = False
+        bpy.context.object.data.collections_all["deformation_bones"].is_visible = False
 
             
         # Return to Object Mode

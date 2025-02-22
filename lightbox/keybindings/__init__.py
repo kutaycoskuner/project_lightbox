@@ -21,9 +21,10 @@ addon_keymaps = []
 
 
 key_tuples = (
-#    id,                            key,    ctrl,   shift,  alt
+#    id,                              key,    ctrl,   shift,  alt
     ('view3d.focus_outliner',         'W',    False,  True,   True),
     ('object.originto_geometry',      'S',    False,  True,   True),
     ('object.originto_ground',        'C',    False,  True,   True),
+    # ('view3d.toggle_sidebar_tab',     'Z',    True,   True,   False),  
     # ('node.draw_squares',           'S',    False,  True,   True),
 )
