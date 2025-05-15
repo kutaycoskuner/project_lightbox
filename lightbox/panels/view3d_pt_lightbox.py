@@ -36,6 +36,19 @@ class View3D_PT_Lightbox(bpy.types.Panel):
         row.operator('shader.toggle_clay_operator')
         row.alignment = 'CENTER'
         row.label(text=display_toggle_clay)
+        
+        # Viewport Presets Section
+        layout.label(text="Viewport Presets")
+        row = layout.row()
+        # row.operator('render.preset_cel_shading')
+        row.operator('view3d.preset_viewport_default')
+        row.operator('view3d.preset_viewport_cavity')
+        
+        # Render Presets Section
+        layout.label(text="Render Presets")
+        row = layout.row()
+        row.operator('render.preset_default_shading')
+        row.operator('render.preset_cel_shading')
 
         # Viewport Control Section
         layout.label(text="Ease of Access")

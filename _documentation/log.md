@@ -56,10 +56,22 @@
 
 # Log 
 - [todo]
+    - 20250515 add viewport display presets on readme
+    - 20250515 add cel shading and render presets on readme
     - 20250214 project object renamer / organizer 
     - 20240906 bake a single node
     - 20250129 job queue
     - 20250129 hasher to trace when to call function
+
+- [0.7.0] render and viewport presets
+    - 14-May-2025
+        - blender version update to 4, 4, 3
+        - added viewport preset cavity and default for testing
+    - 13-Mar-2025
+        - added default render preset
+        - added cel shading render preset
+    - 22-Feb-2025
+        - added clavicle controls basic
 
 - [0.6.0] add scaled armature weight operator, deformation control and shapes
     - 22-Feb-2025

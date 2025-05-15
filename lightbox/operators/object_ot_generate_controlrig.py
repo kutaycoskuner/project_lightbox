@@ -85,9 +85,6 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         self.report({'INFO'}, f"Isolated and hidden subcollection '{subcollection_name}' at scene root.")
 
     def execute(self, context):
-        
-        #       import control shapes       ----------------------------------------------
-        self.import_control_shapes()
                 
         #       generate rig       -------------------------------------------------------
         
@@ -107,8 +104,11 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         # Ensure base rig exists
         base_rig = bpy.data.objects.get(base_rig_name)
         if not base_rig or base_rig.type != 'ARMATURE':
-            self.report({'ERROR'}, "Base rig not found")
+            self.report({'ERROR'}, "Base rig not found. Try add Armature > Lightbox Base Rig")
             return {'CANCELLED'}
+        
+        #       import control shapes       ----------------------------------------------
+        self.import_control_shapes()
 
         # Duplicate the base rig
         control_rig = base_rig.copy()
@@ -613,7 +613,7 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         parent_name = "def_pelvis"
         set_bone_parent(ctrl_bone_name, parent_name)
         
-        bone_name = "_neck02"
+        bone_name = "_neck01"
         def_bone_name = f"def{bone_name}"
         ctrl_bone_name = f"ctrl{bone_name}"
         create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
@@ -621,6 +621,16 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
         ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
         ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)  
         parent_name = "def_chest"
+        set_bone_parent(ctrl_bone_name, parent_name)
+        
+        bone_name = "_neck02"
+        def_bone_name = f"def{bone_name}"
+        ctrl_bone_name = f"ctrl{bone_name}"
+        create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
+        stylize_bone(ctrl_bone_name, "general_circle", 12, 1.2)
+        ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+        ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)  
+        parent_name = "def_neck01"
         set_bone_parent(ctrl_bone_name, parent_name)
         
         bone_name = "_head"
@@ -681,6 +691,23 @@ class Object_OT_GenerateControlRig(bpy.types.Operator):
             ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
             ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)  
             parent_name = f"ctrl_hand-palm.{side}"
+            set_bone_parent(ctrl_bone_name, parent_name)
+            
+            bone_name = f"_clavicle.{side}"
+            def_bone_name = f"def{bone_name}"
+            ctrl_bone_name = f"ctrl{bone_name}"
+            create_control_bone_from_deformation(control_rig, def_bone_name, ctrl_bone_name)
+            stylize_bone(ctrl_bone_name, "end", 12, .5)
+            ctrl_bone = control_rig.pose.bones.get(ctrl_bone_name)
+            ctrl_bone.custom_shape_rotation_euler[0] = math.radians(90)
+            ctrl_bone.custom_shape_rotation_euler[1] = math.radians(0)
+            ctrl_bone.custom_shape_rotation_euler[2] = math.radians(90)  
+            translation = 0.1
+            translation = translation if side == "L" else -translation
+            ctrl_bone.custom_shape_translation[0] = translation
+            ctrl_bone.custom_shape_translation[1] = 0.1
+              
+            parent_name = f"def_chest"
             set_bone_parent(ctrl_bone_name, parent_name)
             
         # foot ik

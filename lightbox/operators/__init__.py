@@ -5,8 +5,12 @@ from . import (
     object_ot_originto_ground,
     object_ot_scaled_armature_weight,
     ot_toggle_sidebar_tab,
+    render_ot_preset_cel,
+    render_ot_preset_default,
     shader_ot_toggleclay,
     view3d_ot_focus_outliner,
+    view3d_ot_preset_viewport_cavity,
+    view3d_ot_preset_viewport_default,
     # node_ot_previewdrawer,
 )
 
@@ -18,8 +22,12 @@ modules = (
     object_ot_originto_ground,
     object_ot_scaled_armature_weight,
     ot_toggle_sidebar_tab,
+    render_ot_preset_cel,
+    render_ot_preset_default,
     shader_ot_toggleclay,
     view3d_ot_focus_outliner,
+    view3d_ot_preset_viewport_cavity,
+    view3d_ot_preset_viewport_default,
     # node_ot_previewdrawer,
 )
 
