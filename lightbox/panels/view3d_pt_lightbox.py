@@ -29,6 +29,7 @@ class View3D_PT_Lightbox(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         display_toggle_clay = str(scene.get("clay_material_applied", False))
+        display_toggle_uvgrid = str(scene.get("uv_material_applied", False))
 
         # Rendering Section
         layout.label(text="Rendering")
@@ -36,6 +37,10 @@ class View3D_PT_Lightbox(bpy.types.Panel):
         row.operator('shader.toggle_clay_operator')
         row.alignment = 'CENTER'
         row.label(text=display_toggle_clay)
+        row = layout.row()
+        row.operator('shader.toggle_uvgrid')
+        row.alignment = 'CENTER'
+        row.label(text=display_toggle_uvgrid)       
         
         # Viewport Presets Section
         layout.label(text="Viewport Presets")

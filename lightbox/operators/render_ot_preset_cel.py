@@ -15,6 +15,10 @@ class Render_OT_Preset_Cel(bpy.types.Operator):
         bpy.context.scene.view_settings.view_transform = 'Standard'
         bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[1].default_value = 1
         bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT'
+        bpy.context.scene.render.filter_size = 0.0
+        bpy.context.scene.render.resolution_x = 384
+        bpy.context.scene.render.resolution_y = 216
+        bpy.context.scene.render.dither_intensity = 0.0
 
 
 # Registration

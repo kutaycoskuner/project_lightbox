@@ -63,6 +63,12 @@
     - 20250129 job queue
     - 20250129 hasher to trace when to call function
 
+- [0.8.0] added uv grid shader preset; mutual exclusivity with clay preset
+    - 20251002
+        - added mutual exclusivity on clay and uv shader presets
+        - added cel and default shader preset settings
+        - added added uv grid shader preset
+
 - [0.7.0] render and viewport presets
     - 14-May-2025
         - blender version update to 4, 4, 3
