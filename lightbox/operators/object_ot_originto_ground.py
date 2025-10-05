@@ -27,7 +27,7 @@ class Object_OT_GroundObject(bpy.types.Operator):
         # Find the lowest Z vertices
         lowest_z = float('inf')
         lowest_z_vertices = []
-        tolerance = 0.1
+        tolerance = 0.05
 
         # Get the object's world matrix for converting local to world space
         world_matrix = obj.matrix_world

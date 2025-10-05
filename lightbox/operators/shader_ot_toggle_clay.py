@@ -1,7 +1,9 @@
 import bpy
+import json
+
 
 class Shader_OT_Toggle_Clay(bpy.types.Operator):
-    """Toggle a simple Clay Material on all mesh objects"""
+    """Toggle a Clay Material on all mesh objects"""
     bl_idname = "shader.toggle_clay_operator"
     bl_label = "Clay Material Preset"
     bl_options = {'REGISTER', 'UNDO'}
@@ -11,79 +13,115 @@ class Shader_OT_Toggle_Clay(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
 
-        # Ensure original_materials storage exists
-        if "original_materials" not in scene:
-            scene["original_materials"] = {}
-
-        # Remove UV Grid override if active
+        # Remove UV Grid if active
         if scene.get("uv_material_applied", False):
             bpy.ops.shader.toggle_uvgrid('INVOKE_DEFAULT')
 
-        # Toggle Clay Material
+        # Toggle Clay
         if scene.get("clay_material_applied", False):
             self.remove_clay_material(context)
+            scene["clay_material_applied"] = False
         else:
             self.apply_clay_material(context)
             self.set_viewport_to_material()
-
-        # Update toggle state
-        scene["clay_material_applied"] = not scene.get("clay_material_applied", False)
+            scene["clay_material_applied"] = True
+            self.warn_override_active(self.material_name)
 
         return {'FINISHED'}
+    
+    def warn_override_active(self, material_name):
+        def draw(self, context):
+            self.layout.label(text=f"{material_name} override active!")
+            self.layout.label(text="Remember to restore original materials before closing.")
+        bpy.context.window_manager.popup_menu(draw, title="Override Warning", icon='INFO')
+
 
     def create_clay_material(self):
-        """Create or get the Clay material"""
+        """Create or get Clay material, clean nodes, and build preset"""
         mat = bpy.data.materials.get(self.material_name)
         if mat is None:
             mat = bpy.data.materials.new(self.material_name)
-            mat.use_nodes = True
-        else:
-            mat.use_nodes = True
-            mat.node_tree.nodes.clear()
+            
+        mat.use_nodes = True
+        mat.node_tree.nodes.clear()
 
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
 
-        # Nodes
+        # Only one Output + Principled
         output_node = nodes.new("ShaderNodeOutputMaterial")
-        diffuse_node = nodes.new("ShaderNodeBsdfDiffuse")
+        principled_node = nodes.new("ShaderNodeBsdfPrincipled")
 
         output_node.location = (400, 0)
-        diffuse_node.location = (0, 0)
+        principled_node.location = (0, 0)
 
-        # Optionally, set a simple gray color for Clay
-        diffuse_node.inputs["Color"].default_value = (0.8, 0.8, 0.8, 1.0)
+        # Set inputs safely
+        if "Base Color" in principled_node.inputs:
+            principled_node.inputs["Base Color"].default_value = (0.8, 0.8, 0.8, 1)
+        if "Roughness" in principled_node.inputs:
+            principled_node.inputs["Roughness"].default_value = 0.7
+        if "Specular" in principled_node.inputs:
+            principled_node.inputs["Specular"].default_value = 0.2
 
-        # Link
-        links.new(diffuse_node.outputs["BSDF"], output_node.inputs["Surface"])
+        links.new(principled_node.outputs[0], output_node.inputs[0])
 
         return mat
 
+
     def apply_clay_material(self, context):
         """Apply Clay material to all mesh objects and save originals"""
+        scene = context.scene
         mat = self.create_clay_material()
         original_materials = {}
 
-        for obj in context.scene.objects:
+        for obj in scene.objects:
             if obj.type == 'MESH':
                 # Save original material names
-                original_materials[obj.name] = [slot.material.name if slot.material else None for slot in obj.material_slots]
+                mats = [slot.material.name if slot.material else "" for slot in obj.material_slots]
+                original_materials[obj.name] = mats
+
+                # Apply clay material
                 for slot in obj.material_slots:
                     slot.material = mat
 
-        context.scene["original_materials"] = original_materials
+        # Store JSON-encoded data in the scene
+        scene["clay_original_materials_json"] = json.dumps(original_materials)
 
     def remove_clay_material(self, context):
         """Restore original materials to all mesh objects"""
-        original_materials = context.scene.get("original_materials", {})
+        scene = context.scene
+        original_materials = {}
+
+        if "clay_original_materials_json" in scene:
+            try:
+                original_materials = json.loads(scene["clay_original_materials_json"])
+            except Exception:
+                pass
 
         for obj in context.scene.objects:
             if obj.type == 'MESH' and obj.name in original_materials:
-                for i, slot in enumerate(obj.material_slots):
-                    mat_name = original_materials[obj.name][i]
-                    slot.material = bpy.data.materials.get(mat_name) if mat_name else None
+                mat_names = original_materials[obj.name]
 
-        context.scene["original_materials"] = {}
+                # Ensure same number of slots
+                while len(obj.material_slots) < len(mat_names):
+                    obj.data.materials.append(None)
+
+                for i, slot in enumerate(obj.material_slots):
+                    # Safe check in case original materials are missing
+                    if i < len(mat_names):
+                        name = mat_names[i]
+                        slot.material = bpy.data.materials.get(name) if name else None
+                    else:
+                        slot.material = None
+
+        # Clear JSON after restore
+        if "clay_original_materials_json" in scene:
+            del scene["clay_original_materials_json"]
+
+        # Optionally remove temporary clay material
+        clay_mat = bpy.data.materials.get(self.material_name)
+        if clay_mat:
+            bpy.data.materials.remove(clay_mat, do_unlink=True)
 
     def set_viewport_to_material(self):
         """Set all 3D Viewports to Material preview shading"""
@@ -94,35 +132,30 @@ class Shader_OT_Toggle_Clay(bpy.types.Operator):
                         space.shading.type = 'MATERIAL'
 
 
-# --- Helper function ---
-def remove_clay_material_override(context, material_name):
-    """Restore original materials and remove Clay material"""
-    scene = context.scene
-    original_materials = scene.get("original_materials", {})
-
-    for obj in context.scene.objects:
-        if obj.type == 'MESH' and obj.name in original_materials:
-            for i, slot in enumerate(obj.material_slots):
-                mat_name = original_materials[obj.name][i]
-                slot.material = bpy.data.materials.get(mat_name) if mat_name else None
-
-    scene["original_materials"] = {}
-
-    # Remove the override material
-    mat = bpy.data.materials.get(material_name)
-    if mat:
-        bpy.data.materials.remove(mat)
-
+# ----- free functions
+def restore_override_materials_on_exit(dummy):
+    scene = bpy.context.scene
+    # Check UV Grid
+    if scene.get("uv_material_applied", False):
+        bpy.ops.shader.toggle_uvgrid('INVOKE_DEFAULT')
+    # Check Clay
+    if scene.get("clay_material_applied", False):
+        bpy.ops.shader.toggle_clay_operator('INVOKE_DEFAULT')
+        
 
 # --- Registration ---
 classes = (
     Shader_OT_Toggle_Clay,
 )
 
+
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
+
 def unregister():
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
+        
+

@@ -1,4 +1,6 @@
 import bpy
+import json
+
 
 class Shader_OT_Toggle_UVGrid(bpy.types.Operator):
     """Toggle a UV Test Grid Material on all mesh objects"""
@@ -11,35 +13,36 @@ class Shader_OT_Toggle_UVGrid(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
 
-        # Ensure original_materials storage exists
-        if "original_materials" not in scene:
-            scene["original_materials"] = {}
-
-        # Remove Clay override if active
+        # Remove Clay if active
         if scene.get("clay_material_applied", False):
             bpy.ops.shader.toggle_clay_operator('INVOKE_DEFAULT')
 
         # Toggle UV Grid
         if scene.get("uv_material_applied", False):
             self.remove_uv_material(context)
+            scene["uv_material_applied"] = False
         else:
             self.apply_uv_material(context)
             self.set_viewport_to_material()
-
-        # Update toggle state
-        scene["uv_material_applied"] = not scene.get("uv_material_applied", False)
+            scene["uv_material_applied"] = True
+            self.warn_override_active(self.material_name)
 
         return {'FINISHED'}
+
+    def warn_override_active(self, material_name):
+        def draw(self, context):
+            self.layout.label(text=f"{material_name} override active!")
+            self.layout.label(text="Remember to restore original materials before closing.")
+        bpy.context.window_manager.popup_menu(draw, title="Override Warning", icon='INFO')
 
     def create_uv_material(self):
         """Create or get the UV grid material"""
         mat = bpy.data.materials.get(self.material_name)
         if mat is None:
             mat = bpy.data.materials.new(self.material_name)
-            mat.use_nodes = True
-        else:
-            mat.use_nodes = True
-            mat.node_tree.nodes.clear()
+            
+        mat.use_nodes = True
+        mat.node_tree.nodes.clear()
 
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
@@ -69,30 +72,46 @@ class Shader_OT_Toggle_UVGrid(bpy.types.Operator):
 
     def apply_uv_material(self, context):
         """Apply UV material to all mesh objects and save originals"""
+        scene = context.scene
         mat = self.create_uv_material()
         original_materials = {}
 
-        for obj in context.scene.objects:
+        for obj in scene.objects:
             if obj.type == 'MESH':
-                # Save original material names
-                original_materials[obj.name] = [slot.material.name if slot.material else None for slot in obj.material_slots]
+                mats = [slot.material.name if slot.material else "" for slot in obj.material_slots]
+                original_materials[obj.name] = mats
+
                 for slot in obj.material_slots:
                     slot.material = mat
 
-        context.scene["original_materials"] = original_materials
+        # Store JSON-encoded data in the scene
+        scene["shader_original_materials_json"] = json.dumps(original_materials)
 
     def remove_uv_material(self, context):
         """Restore original materials to all mesh objects"""
-        original_materials = context.scene.get("original_materials", {})
+        scene = context.scene
+        original_materials = {}
 
-        for obj in context.scene.objects:
+        if "shader_original_materials_json" in scene:
+            try:
+                original_materials = json.loads(scene["shader_original_materials_json"])
+            except Exception:
+                pass
+
+        for obj in scene.objects:
             if obj.type == 'MESH' and obj.name in original_materials:
-                for i, slot in enumerate(obj.material_slots):
-                    mat_name = original_materials[obj.name][i]
-                    slot.material = bpy.data.materials.get(mat_name) if mat_name else None
+                mat_names = original_materials[obj.name]
 
-        # Clear saved originals
-        context.scene["original_materials"] = {}
+                # Ensure same number of slots
+                while len(obj.material_slots) < len(mat_names):
+                    obj.data.materials.append(None)
+
+                for i, name in enumerate(mat_names):
+                    obj.material_slots[i].material = bpy.data.materials.get(name) if name else None
+
+        # Clear data from scene
+        if "shader_original_materials_json" in scene:
+            del scene["shader_original_materials_json"]
 
     def set_viewport_to_material(self):
         """Set all 3D Viewports to Material preview shading"""
@@ -103,24 +122,6 @@ class Shader_OT_Toggle_UVGrid(bpy.types.Operator):
                         space.shading.type = 'MATERIAL'
 
 
-# --- Helper function ---
-def remove_override_material(context, material_name):
-    """Restore original materials and remove override material"""
-    scene = context.scene
-    original_materials = scene.get("original_materials", {})
-
-    for obj in context.scene.objects:
-        if obj.type == 'MESH' and obj.name in original_materials:
-            for i, slot in enumerate(obj.material_slots):
-                mat_name = original_materials[obj.name][i]
-                slot.material = bpy.data.materials.get(mat_name) if mat_name else None
-
-    scene["original_materials"] = {}
-
-    # Remove the override material
-    mat = bpy.data.materials.get(material_name)
-    if mat:
-        bpy.data.materials.remove(mat)
 
 
 # --- Registration ---

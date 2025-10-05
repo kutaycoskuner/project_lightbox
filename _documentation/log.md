@@ -63,6 +63,14 @@
     - 20250129 job queue
     - 20250129 hasher to trace when to call function
 
+
+- [0.8.1] fix override material problem
+    - 20251005
+        - changed key of origin to ground modifier
+        - changed tolerance of origin to ground
+        - added warnings to revert before closing
+        - fixing render preview material problem
+
 - [0.8.0] added uv grid shader preset; mutual exclusivity with clay preset
     - 20251002
         - added mutual exclusivity on clay and uv shader presets
